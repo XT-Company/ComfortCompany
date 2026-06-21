@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --sidebar-bg: #f0f2f5;
+            --input-bg: #ffffff;
+            --border-color: #cccccc;
+            --btn-bg: #007bff;
+            --btn-text: #ffffff;
+            --icon-stroke: #333333;
+            --panel-bg: #fafafa;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #18191a;
+            --text-color: #e4e6eb;
+            --sidebar-bg: #242526;
+            --input-bg: #3a3b3c;
+            --border-color: #3e4042;
+            --btn-bg: #2d88ff;
+            --btn-text: #ffffff;
+            --icon-stroke: #e4e6eb;
+            --panel-bg: #1c1d1e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Auth Containers */
+        .auth-container {
+            background: var(--sidebar-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--btn-bg);
+        }
+
+        .code-display {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .error-msg {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Sidebar & Main Interface */
+        .main-app {
+            display: none;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-top, .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .nav-btn svg {
+            width: 26px;
+            height: 26px;
+            stroke: var(--icon-stroke);
+            transition: stroke 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--border-color);
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .page {
+            display: none;
+            height: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Layout Panels */
+        .two-column-layout {
+            display: flex;
+            gap: 20px;
+            height: calc(100% - 40px);
+            margin-top: 20px;
+        }
+
+        .panel-left, .panel-full {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-left { width: 45%; }
+        .panel-right { width: 55%; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
+        .panel-full { width: 100%; height: calc(100% - 40px); margin-top: 20px; }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .scrollable-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            color: gray;
+            margin: auto;
+            font-style: italic;
+        }
+
+        .item-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .item-card h4 { margin-bottom: 6px; }
+        .item-card p { font-size: 14px; }
+
+        .dialer-box {
+            max-width: 320px;
+            margin: auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Company CSS */
+        .company-header-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .company-logo-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: var(--sidebar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid var(--border-color);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .settings-layout { max-width: 600px; }
+        .settings-section { margin-bottom: 30px; }
+        .settings-section h3 { margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .theme-switch-box { display: flex; gap: 15px; }
+        .btn-secondary { background: var(--border-color); color: var(--text-color); }
+        .btn-danger { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="registerWindow" class="auth-container">
+        <h2>Create Account</h2>
+        <form id="regForm">
+            <div class="form-group"><label>First Name</label><input type="text" id="regFirstname" required></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="regLastname" required></div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="regAge" required>
+                <div id="ageError" class="error-msg">Registration is only allowed for ages 7 and older!</div>
+            </div>
+            <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" required></div>
+            <button type="submit" class="btn btn-full">Sign Up</button>
+        </form>
+        <div class="switch-auth" onclick="showAuthPage('login')">I already have an access code</div>
+        <div id="codeResult" class="code-display" style="display: none;"></div>
+    </div>
+
+    <div id="loginWindow" class="auth-container" style="display: none;">
+        <h2>Log In</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Enter your special access code</label>
+                <input type="text" id="loginCode" required>
+                <div id="loginError" class="error-msg">Invalid access code!</div>
+            </div>
+            <button type="submit" class="btn btn-full">Log In</button>
+        </form>
+        <div class="switch-auth" onclick="showAuthPage('register')">Create a new account</div>
+    </div>
+
+
+    <div id="mainApp" class="main-app">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <button class="nav-btn" onclick="switchPage('page-phone', this)" title="Phone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <button class="nav-btn" onclick="switchPage('page-company', this)" title="Company">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="10" width="20" height="12" rx="2" ry="2"></rect>
+                        <path d="M6 10V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6"></path>
+                    </svg>
+                </button>
+                
+                <button class="nav-btn" onclick="switchPage('page-document', this)" title="Documents">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="sidebar-bottom">
+                <button class="nav-btn" onclick="switchPage('page-settings', this)" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            
+            <div id="page-phone" class="page">
+                <h2>Phone Interface</h2>
+                <div class="two-column-layout">
+                    <div class="panel-left">
+                        <div class="panel-header"><h3>Contacts</h3><button class="btn" onclick="openModal('contactModal')">Create Contact</button></div>
+                        <div id="contactsContainer" class="scrollable-list"></div>
+                    </div>
+                    <div class="panel-right">
+                        <div class="panel-header">
+                            <h3>Make a Call</h3>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="myNumbersSelect" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color);"></select>
+                                <button class="btn" onclick="openNumberRegModal()">Register Number</button>
+                            </div>
+                        </div>
+                        <div class="dialer-box">
+                            <div class="form-group" style="margin-top: 40px;"><label>Enter destination number</label><input type="text" id="dialNumberInput" placeholder="+1 0000000" style="font-size: 20px; text-align: center; letter-spacing: 1px;"></div>
+                            <button class="btn btn-full" onclick="makeCall()" style="background: #28a745; font-size: 18px; padding: 15px;">Call</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-company" class="page">
+                <h2>Company Hub</h2>
+                <div id="companyStateUnregistered" style="text-align: center; margin-top: 80px;">
+                    <p style="font-size: 18px; color: gray; margin-bottom: 20px;">Not registered in any company</p>
+                    <button class="btn" style="padding: 15px 30px; font-size: 16px;" onclick="openModal('companyChoiceModal')">Register / Join Company</button>
+                </div>
+                <div id="companyStateDashboard" class="two-column-layout" style="display: none;">
+                    <div class="panel-left">
+                        <div class="company-header-card">
+                            <div id="compDashboardLogo" class="company-logo-preview">🏢</div>
+                            <div><h3 id="compDashboardName">Company Name</h3><p id="compDashboardAddress" style="font-size: 12px; color: gray;">Address</p></div>
+                        </div>
+                        <p id="compDashboardBio" style="font-size: 13px; margin-bottom: 15px; padding: 5px; font-style: italic;"></p>
+                        <div class="panel-header" style="margin-bottom: 10px;"><h4>Members Directory</h4></div>
+                        <div id="companyMembersContainer" class="scrollable-list"></div>
+                    </div>
+                    <div class="panel-right">
+                        <div class="panel-header">
+                            <h3>Workspace Actions</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-secondary" onclick="openModal('widgetsModal')">Add Widgets</button>
+                                <button id="compSettingsBtn" class="btn" onclick="openCompanySettingsModal()">Company Settings</button>
+                            </div>
+                        </div>
+                        <div class="empty-placeholder">Select an action above to manage your corporate assets.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-document" class="page">
+                <div class="panel-header">
+                    <h2>Documents Panel</h2>
+                    <button class="btn" onclick="openModal('documentModal')">Create Document</button>
+                </div>
+                <div class="panel-full">
+                    <div id="documentsContainer" class="scrollable-list">
+                        </div>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page">
+                <h2>Settings</h2>
+                <div class="settings-layout">
+                    <div class="settings-section">
+                        <h3>App Theme</h3>
+                        <div class="theme-switch-box">
+                            <button class="btn btn-secondary" onclick="setTheme('light')">Light</button>
+                            <button class="btn btn-secondary" onclick="setTheme('dark')">Dark</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Personal Information</h3>
+                        <form id="editProfileForm">
+                            <div class="form-group"><label>First Name</label><input type="text" id="editFirstname" required></div>
+                            <div class="form-group"><label>Last Name</label><input type="text" id="editLastname" required></div>
+                            <div class="form-group"><label>Email Address</label><input type="email" id="editEmail" required></div>
+                            <button type="submit" class="btn" style="width: auto; padding: 10px 20px;">Save Changes</button>
+                        </form>
+                    </div>
+                    <div class="settings-section"><button class="btn btn-danger" onclick="logout()" style="width: auto;">Log Out</button></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Create New Contact</h3>
+            <form id="contactForm" style="margin-top: 15px;">
+                <div class="form-group"><label>First Name *</label><input type="text" id="conFirstname" required></div>
+                <div class="form-group"><label>Last Name *</label><input type="text" id="conLastname" required></div>
+                <div class="form-group"><label>Age</label><input type="number" id="conAge"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="conEmail"></div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <div class="phone-input-container">
+                        <select id="conCode"><option value="+2">+2 Russia</option><option value="+1">+1 USA</option></select>
+                        <input type="text" id="conNumber" placeholder="1234567" maxlength="7" pattern="\d{7}" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('contactModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="numberRegModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Register Virtual Number</h3>
+            <div class="form-group"><label>Select Region</label><select id="regNumberRegion" onchange="generateDailyNumbersPool()"><option value="+1">+1 USA</option><option value="+2">+2 Russia</option></select></div>
+            <div class="form-group"><label>Choose a Number</label><select id="regNumberPoolSelect"></select></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('numberRegModal')">Cancel</button>
+                <button type="button" class="btn" onclick="saveRegisteredNumber()">Register</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="companyChoiceModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h3>Company Hub Registry</h3>
+            <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn" onclick="closeModal('companyChoiceModal'); openModal('companyCreateModal')">Create Company</button>
+                <button class="btn btn-secondary" onclick="closeModal('companyChoiceModal'); openModal('companyJoinModal')">Join Existing Company</button>
+                <button class="btn btn-danger" style="background:gray;" onclick="closeModal('companyChoiceModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="companyCreateModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Establish New Company</h3>
+            <form id="companyCreateForm" style="margin-top: 15px;">
+                <div class="form-group"><label>Company Name *</label><input type="text" id="creationCompName" required></div>
+                <div class="form-group"><label>Company Address</label><input type="text" id="creationCompAddress"></div>
+                <div class="form-group"><label>Company Bio *</label><textarea id="creationCompBio" rows="3" required></textarea></div>
+                <div class="form-group"><label>Logo URL</label><input type="url" id="creationCompLogo"></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyCreateModal')">Cancel</button><button type="submit" class="btn">Create & Launch</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="companyJoinModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Join Corporate Network</h3>
+            <form id="companyJoinForm" style="margin-top: 15px;">
+                <div class="form-group"><label>Enter Corporate Token</label><input type="text" id="joinCompCode" placeholder="COMP-XXXXXXXXX" required></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyJoinModal')">Cancel</button><button type="submit" class="btn">Authenticate</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="companySettingsModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Corporate Control Center</h3>
+            <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
+                <h4>Modify Profile</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Name</label><input type="text" id="setCompName"></div>
+                <div class="form-group"><label>Address</label><input type="text" id="setCompAddress"></div>
+                <div class="form-group"><label>Bio</label><textarea id="setCompBio" rows="2"></textarea></div>
+                <div class="form-group"><label>Logo URL</label><input type="url" id="setCompLogo"></div>
+                <button class="btn" onclick="saveCompanyProfileChanges()">Apply Profile Updates</button>
+            </div>
+            <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
+                <h4>Access Tokens</h4>
+                <button class="btn btn-secondary" style="margin-top:5px;" onclick="generateCompanyInviteToken()">Generate Invitation Code</button>
+                <div id="inviteCodeDisplay" class="code-display" style="display:none; margin-top:10px;"></div>
+            </div>
+            <div style="margin-top:15px;">
+                <h4>Role Architecture Config</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Role Title</label><input type="text" id="newRoleTitle" placeholder="e.g. Lead Designer"></div>
+                <div style="font-size:13px; display:flex; flex-direction:column; gap:5px; margin-bottom:10px;">
+                    <label><input type="checkbox" id="permEditProfile"> Allow Profile Modification</label>
+                    <label><input type="checkbox" id="permEditRoles"> Allow Role Modifications</label>
+                    <label><input type="checkbox" id="permAddWidgets"> Allow Extension/Widget Deployment</label>
+                </div>
+                <button class="btn btn-secondary" onclick="createCustomRole()">Deploy Custom Role</button>
+            </div>
+            <div class="modal-actions"><button class="btn btn-danger" onclick="closeModal('companySettingsModal')">Dismiss</button></div>
+        </div>
+    </div>
+
+    <div id="widgetsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h3>Widget Ecosystem Extension</h3>
+            <p style="margin: 20px 0; font-size:16px; color: #dc3545; font-weight: bold;">[ UNDER DEVELOPMENT ]</p>
+            <button class="btn btn-full" onclick="closeModal('widgetsModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="documentModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Create New Document</h3>
+            <form id="documentForm" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Document Title *</label>
+                    <input type="text" id="docTitle" placeholder="e.g. Report Summary" required>
+                </div>
+                <div class="form-group">
+                    <label>Font Styling / Weight</label>
+                    <select id="docFontWeight">
+                        <option value="normal">Normal Style</option>
+                        <option value="bold">Bold Text</option>
+                        <option value="italic">Italic Text</option>
+                        <option value="underline">Underline Text</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Document Content Body *</label>
+                    <textarea id="docContent" rows="6" placeholder="Type text here..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        let currentAccountCode = null;
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('site-theme') || 'light';
+            setTheme(savedTheme);
+            const sessionCode = sessionStorage.getItem('currentClientCode');
+            if (sessionCode && localStorage.getItem('user_' + sessionCode)) {
+                loginToApp(sessionCode);
+            }
+        };
+
+        function showAuthPage(page) {
+            document.getElementById('ageError').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('codeResult').style.display = 'none';
+            if(page === 'login') {
+                document.getElementById('registerWindow').style.display = 'none';
+                document.getElementById('loginWindow').style.display = 'block';
+            } else {
+                document.getElementById('registerWindow').style.display = 'block';
+                document.getElementById('loginWindow').style.display = 'none';
+            }
+        }
+
+        function generateUniqueToken(prefix = 'ID') {
+            return prefix + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        // Registration
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const firstname = document.getElementById('regFirstname').value;
+            const lastname = document.getElementById('regLastname').value;
+            const age = parseInt(document.getElementById('regAge').value);
+            const email = document.getElementById('regEmail').value;
+
+            if (age < 7) {
+                document.getElementById('ageError').style.display = 'block';
+                return;
+            }
+
+            const accessCode = generateUniqueToken('ID');
+            const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
+            localStorage.setItem('user_' + accessCode, JSON.stringify(userData));
+
+            const codeResult = document.getElementById('codeResult');
+            codeResult.innerHTML = `Success!<br>Your secret code: <span style="user-select:all; color:blue;">${accessCode}</span><br><small>Copy it to log in next time.</small>`;
+            codeResult.style.display = 'block';
+            this.reset();
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = document.getElementById('loginCode').value.trim();
+            if (localStorage.getItem('user_' + code)) {
+                sessionStorage.setItem('currentClientCode', code);
+                loginToApp(code);
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+
+        function loginToApp(code) {
+            currentAccountCode = code;
+            document.getElementById('registerWindow').style.display = 'none';
+            document.getElementById('loginWindow').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+            
+            const userData = JSON.parse(localStorage.getItem('user_' + code));
+            document.getElementById('editFirstname').value = userData.firstname;
+            document.getElementById('editLastname').value = userData.lastname;
+            document.getElementById('editEmail').value = userData.email;
+
+            // Integrity fallback arrays
+            if(!userData.documents) userData.documents = [];
+            localStorage.setItem('user_' + code, JSON.stringify(userData));
+
+            renderContacts();
+            updateMyNumbersDropdown();
+            renderCompanyView();
+            renderDocuments();
+
+            const firstBtn = document.querySelector('.nav-btn');
+            switchPage('page-phone', firstBtn);
+        }
+
+        function switchPage(pageId, buttonElement) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        /* --- 2.1 CONTACTS --- */
+        function renderContacts() {
+            const container = document.getElementById('contactsContainer');
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            container.innerHTML = '';
+            if (!userData.contacts || userData.contacts.length === 0) {
+                container.innerHTML = '<div class="empty-placeholder">No contacts</div>'; return;
+            }
+            userData.contacts.forEach(c => {
+                const card = document.createElement('div'); card.className = 'item-card';
+                card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`;
+                container.appendChild(card);
+            });
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            userData.contacts.push({
+                firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value,
+                code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value
+            });
+            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+            closeModal('contactModal'); this.reset(); renderContacts();
+        });
+
+        /* --- 2.2 CALLING HARDWARE TUNNEL --- */
+        function generateDailyNumbersPool() {
+            const region = document.getElementById('regNumberRegion').value;
+            const select = document.getElementById('regNumberPoolSelect'); select.innerHTML = '';
+            const seed = new Date().toDateString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            for (let i = 0; i < 4; i++) {
+                let pseudoRandom = Math.abs(Math.sin(seed + i) * 10000000);
+                let num7Digits = Math.floor(pseudoRandom).toString().padEnd(7, '7').substring(0,7);
+                let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`;
+                select.appendChild(opt);
+            }
+        }
+        function openNumberRegModal() { generateDailyNumbersPool(); openModal('numberRegModal'); }
+        function saveRegisteredNumber() {
+            const selectedNum = document.getElementById('regNumberPoolSelect').value;
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            if(!userData.registeredNumbers.includes(selectedNum)) {
+                userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown();
+            }
+            closeModal('numberRegModal');
+        }
+        function updateMyNumbersDropdown() {
+            const select = document.getElementById('myNumbersSelect'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); select.innerHTML = '';
+            if(!userData.registeredNumbers || userData.registeredNumbers.length === 0) { select.innerHTML = '<option value="">No active number</option>'; return; }
+            userData.registeredNumbers.forEach(num => { let opt = document.createElement('option'); opt.value = num; opt.textContent = num; select.appendChild(opt); });
+        }
+        function makeCall() {
+            const activeLine = document.getElementById('myNumbersSelect').value;
+            if (!activeLine) { alert('Call not processed. You must register and select an active virtual number first!'); return; }
+            alert(`Dialing from line [${activeLine}] to [${document.getElementById('dialNumberInput').value}]...\nConnection active!`);
+        }
+
+        /* --- 3. COMPANY NETWORK --- */
+        function renderCompanyView() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            if (!userData.companyId) {
+                document.getElementById('companyStateUnregistered').style.display = 'block'; document.getElementById('companyStateDashboard').style.display = 'none';
+            } else {
+                document.getElementById('companyStateUnregistered').style.display = 'none'; document.getElementById('companyStateDashboard').style.display = 'flex';
+                const globalCompanyData = JSON.parse(localStorage.getItem('company_' + userData.companyId)); if(!globalCompanyData) return;
+
+                document.getElementById('compDashboardName').textContent = globalCompanyData.name;
+                document.getElementById('compDashboardAddress').textContent = globalCompanyData.address || 'No Address Provided';
+                document.getElementById('compDashboardBio').textContent = globalCompanyData.bio;
+                const logoBox = document.getElementById('compDashboardLogo');
+                if (globalCompanyData.logo) logoBox.innerHTML = `<img src="${globalCompanyData.logo}" class="company-logo-preview" alt="logo">`; else logoBox.innerHTML = '🏢';
+
+                if (userData.companyRole === 'Administrator') { document.getElementById('compSettingsBtn').style.display = 'block'; } else {
+                    const matchedRoleObj = globalCompanyData.roles.find(r => r.title === userData.companyRole);
+                    if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block';
+                    else document.getElementById('compSettingsBtn').style.display = 'none';
+                }
+                const membersContainer = document.getElementById('companyMembersContainer'); membersContainer.innerHTML = '';
+                globalCompanyData.members.forEach(m => {
+                    const card = document.createElement('div'); card.className = 'item-card';
+                    card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card);
+                });
+            }
+        }
+        document.getElementById('companyCreateForm').addEventListener('submit', function(e) {
+            e.preventDefault(); const compId = generateUniqueToken('COMP'); const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            const companyPayload = {
+                id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value,
+                bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [],
+                members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }]
+            };
+            localStorage.setItem('company_' + compId, JSON.stringify(companyPayload));
+            userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+            closeModal('companyCreateModal'); this.reset(); renderCompanyView();
+        });
+        document.getElementById('companyJoinForm').addEventListener('submit', function(e) {
+            e.preventDefault(); const inputtedToken = document.getElementById('joinCompCode').value.trim(); let foundCompany = null;
+            for(let key in localStorage) {
+                if(key.startsWith('company_')) {
+                    let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; }
+                }
+            }
+            if(!foundCompany) { alert('Invalid Workspace Token!'); return; }
+            const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
+            localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany));
+            userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+            closeModal('companyJoinForm'); this.reset(); renderCompanyView();
+        });
+        function openCompanySettingsModal() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+            document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address;
+            document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
+            document.getElementById('inviteCodeDisplay').style.display = 'none'; openModal('companySettingsModal');
+        }
+        function saveCompanyProfileChanges() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+            companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value;
+            companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
+            localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); renderCompanyView(); alert('Profile updated!');
+        }
+        function generateCompanyInviteToken() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+            if(!companyData.activeInviteTokens) companyData.activeInviteTokens = []; const generatedToken = generateUniqueToken('TOKEN');
+            companyData.activeInviteTokens.push(generatedToken); localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData));
+            const display = document.getElementById('inviteCodeDisplay'); display.textContent = generatedToken; display.style.display = 'block';
+        }
+        function createCustomRole() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+            const title = document.getElementById('newRoleTitle').value.trim(); if(!title) return;
+            companyData.roles.push({
+                title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked
+            });
+            localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); document.getElementById('newRoleTitle').value = ''; alert(`Role ${title} Created.`);
+        }
+
+        /* --- 4. DOCUMENTS ARCHITECTURE --- */
+        function renderDocuments() {
+            const container = document.getElementById('documentsContainer');
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            container.innerHTML = '';
+
+            if (!userData.documents || userData.documents.length === 0) {
+                container.innerHTML = '<div class="empty-placeholder">No documents available</div>';
+                return;
+            }
+
+            userData.documents.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+
+                // Determine CSS style mutations based on font configuration nodes
+                let styleInline = '';
+                if(doc.style === 'bold') styleInline = 'font-weight: bold;';
+                if(doc.style === 'italic') styleInline = 'font-style: italic;';
+                if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
+
+                card.innerHTML = `
+                    <h4>${doc.title}</h4>
+                    <p style="${styleInline}">${doc.content}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        document.getElementById('documentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+
+            const newDocPayload = {
+                title: document.getElementById('docTitle').value,
+                style: document.getElementById('docFontWeight').value,
+                content: document.getElementById('docContent').value
+            };
+
+            if(!userData.documents) userData.documents = [];
+            userData.documents.push(newDocPayload);
+            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+
+            closeModal('documentModal');
+            this.reset();
+            renderDocuments();
+        });
+
+
+        /* --- GLOBAL CONTROL SYSTEM --- */
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value;
+            userData.email = document.getElementById('editEmail').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
+        });
+
+        function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('site-theme', themeName); }
+        function logout() { sessionStorage.removeItem('currentClientCode'); currentAccountCode = null; document.getElementById('mainApp').style.display = 'none'; document.getElementById('loginForm').reset(); showAuthPage('register'); }
+    </script>
+</body>
+</html>
