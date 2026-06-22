@@ -261,6 +261,23 @@
             text-align: center;
         }
 
+        /* Web Frame Container for Gmail */
+        .gmail-iframe-container {
+            width: 100%;
+            height: calc(100% - 40px);
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .gmail-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         /* Company CSS */
         .company-header-card {
             display: flex;
@@ -383,7 +400,7 @@
                     </svg>
                 </button>
 
-                <button class="nav-btn" onclick="switchPage('page-mail', this)" title="Mail">
+                <button class="nav-btn" onclick="switchPage('page-mail', this)" title="Gmail">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                         <polyline points="22,6 12,13 2,6"></polyline>
@@ -466,30 +483,9 @@
             </div>
 
             <div id="page-mail" class="page">
-                <h2>Mail Center</h2>
-                
-                <div id="mailStateAuth" style="max-width: 360px; margin: 60px auto 0 auto; background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h3 style="text-align: center; margin-bottom: 20px;">Sign in with Mail Account</h3>
-                    <form id="mailLoginForm">
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" id="mailInputEmail" placeholder="username@gmail.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" id="mailInputPassword" placeholder="••••••••" required>
-                        </div>
-                        <button type="submit" class="btn btn-full">Sign In</button>
-                    </form>
-                </div>
-
-                <div id="mailStateDashboard" class="panel-full" style="display: none;">
-                    <div class="panel-header">
-                        <h3 id="mailDashboardTitle">Inbox</h3>
-                        <button class="btn btn-secondary" onclick="logoutMail()">Disconnect Account</button>
-                    </div>
-                    <div id="mailListContainer" class="scrollable-list">
-                        </div>
+                <h2>Gmail Portal</h2>
+                <div class="gmail-iframe-container">
+                    <iframe src="https://mail.google.com/" allow="clipboard-read; clipboard-write"></iframe>
                 </div>
             </div>
 
@@ -690,7 +686,7 @@
             }
 
             const accessCode = generateUniqueToken('ID');
-            const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [], mailAccount: null };
+            const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
             localStorage.setItem('user_' + accessCode, JSON.stringify(userData));
 
             const codeResult = document.getElementById('codeResult');
@@ -729,7 +725,6 @@
             updateMyNumbersDropdown();
             renderCompanyView();
             renderDocuments();
-            renderMailView();
 
             const firstBtn = document.querySelector('.nav-btn');
             switchPage('page-phone', firstBtn);
@@ -863,52 +858,6 @@
             if(!userData.documents) userData.documents = []; userData.documents.push(newDocPayload); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
             closeModal('documentModal'); this.reset(); renderDocuments();
         });
-
-        /* --- 5. MAIL NETWORK CORE --- */
-        function renderMailView() {
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            if (!userData.mailAccount) {
-                document.getElementById('mailStateAuth').style.display = 'block';
-                document.getElementById('mailStateDashboard').style.display = 'none';
-            } else {
-                document.getElementById('mailStateAuth').style.display = 'none';
-                document.getElementById('mailStateDashboard').style.display = 'block';
-                document.getElementById('mailDashboardTitle').textContent = `Inbox (${userData.mailAccount})`;
-
-                const container = document.getElementById('mailListContainer');
-                container.innerHTML = `
-                    <div class="item-card">
-                        <h4>Welcome to your Workspace System</h4>
-                        <p style="color: gray; font-size:12px; margin-bottom: 5px;">From: system-noreply@dashboard.internal</p>
-                        <p>Your integrated mailbox configuration node has connected successfully.</p>
-                    </div>
-                    <div class="item-card">
-                        <h4>Security Alert: New Sign-in</h4>
-                        <p style="color: gray; font-size:12px; margin-bottom: 5px;">From: security@service.com</p>
-                        <p>An authorized connection mapping transaction was registered for your profile matrix.</p>
-                    </div>
-                `;
-            }
-        }
-
-        document.getElementById('mailLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const emailValue = document.getElementById('mailInputEmail').value.trim();
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            
-            userData.mailAccount = emailValue;
-            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-            
-            this.reset();
-            renderMailView();
-        });
-
-        function logoutMail() {
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            userData.mailAccount = null;
-            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-            renderMailView();
-        }
 
 
         /* --- GLOBAL CONTROL SYSTEM --- */
