@@ -15,6 +15,7 @@
             --btn-text: #ffffff;
             --icon-stroke: #333333;
             --panel-bg: #fafafa;
+            --accent-color: #1a73e8; /* Синий бренд Google для светлой темы */
         }
 
         [data-theme="dark"] {
@@ -27,6 +28,7 @@
             --btn-text: #ffffff;
             --icon-stroke: #e4e6eb;
             --panel-bg: #1c1d1e;
+            --accent-color: #4285f4; /* Яркий синий для темной темы */
         }
 
         * {
@@ -96,6 +98,7 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
+            transition: background 0.2s, opacity 0.2s;
         }
 
         .btn-full {
@@ -261,21 +264,30 @@
             text-align: center;
         }
 
-        /* Web Frame Container for Gmail */
-        .gmail-iframe-container {
-            width: 100%;
-            height: calc(100% - 40px);
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
+        /* Gmail Container */
+        .mail-container {
+            background: var(--panel-bg);
+            padding: 25px;
             border-radius: 12px;
-            overflow: hidden;
-            background: #ffffff;
+            border: 1px solid var(--border-color);
+            margin-top: 20px;
         }
 
-        .gmail-iframe-container iframe {
-            width: 100%;
-            height: 100%;
+        #btn-login {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 12px 28px;
             border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        #btn-login:hover {
+            opacity: 0.95;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         /* Company CSS */
@@ -412,7 +424,7 @@
                 <button class="nav-btn" onclick="switchPage('page-settings', this)" title="Settings">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1 2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                 </button>
             </div>
@@ -484,12 +496,12 @@
 
             <div id="page-mail" class="page">
                 <h2>Gmail Portal</h2>
-                <div class="mail-container" style="background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px;">
+                <div class="mail-container">
         
                     <div id="auth-block" style="text-align: center; padding: 40px 0;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" style="width: 56px; margin-bottom: 20px;">
                         <p style="margin-bottom: 20px; color: var(--text-color); font-size: 15px;">Для просмотра входящих писем необходимо войти в аккаунт Google</p>
-                        <button id="btn-login" class="btn" style="padding: 10px 24px; cursor: pointer; background: var(--accent-color); color: #fff; border: none; border-radius: 6px; font-weight: bold;">Войти через Google</button>
+                        <button id="btn-login">Войти через Google</button>
                     </div>
 
                     <div id="emails-block" style="display: none;">
@@ -497,8 +509,7 @@
                             <span id="user-email" style="font-weight: 500; color: var(--text-color);">Загрузка аккаунта...</span>
                             <button id="btn-logout" style="background: transparent; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Выйти</button>
                         </div>
-                        <div id="emails-list">
-                            </div>
+                        <div id="emails-list"></div>
                     </div>
 
                 </div>
@@ -656,7 +667,6 @@
             </form>
         </div>
     </div>
-
 
 <script>
 		// --- КОНФИГУРАЦИЯ GOOGLE AUTH ---
