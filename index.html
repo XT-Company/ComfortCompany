@@ -484,8 +484,23 @@
 
             <div id="page-mail" class="page">
                 <h2>Gmail Portal</h2>
-                <div class="gmail-iframe-container">
-                    <iframe src="https://mail.google.com/" allow="clipboard-read; clipboard-write"></iframe>
+                <div class="mail-container" style="background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px;">
+        
+                    <div id="auth-block" style="text-align: center; padding: 40px 0;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" style="width: 56px; margin-bottom: 20px;">
+                        <p style="margin-bottom: 20px; color: var(--text-color); font-size: 15px;">Для просмотра входящих писем необходимо войти в аккаунт Google</p>
+                        <button id="btn-login" class="btn" style="padding: 10px 24px; cursor: pointer; background: var(--accent-color); color: #fff; border: none; border-radius: 6px; font-weight: bold;">Войти через Google</button>
+                    </div>
+
+                    <div id="emails-block" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                            <span id="user-email" style="font-weight: 500; color: var(--text-color);">Загрузка аккаунта...</span>
+                            <button id="btn-logout" style="background: transparent; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Выйти</button>
+                        </div>
+                        <div id="emails-list">
+                            </div>
+                    </div>
+
                 </div>
             </div>
 
