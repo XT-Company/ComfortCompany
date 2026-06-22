@@ -382,6 +382,13 @@
                         <line x1="16" y1="17" x2="8" y2="17"></line>
                     </svg>
                 </button>
+
+                <button class="nav-btn" onclick="switchPage('page-mail', this)" title="Mail">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </button>
             </div>
             
             <div class="sidebar-bottom">
@@ -454,7 +461,34 @@
                     <button class="btn" onclick="openModal('documentModal')">Create Document</button>
                 </div>
                 <div class="panel-full">
-                    <div id="documentsContainer" class="scrollable-list">
+                    <div id="documentsContainer" class="scrollable-list"></div>
+                </div>
+            </div>
+
+            <div id="page-mail" class="page">
+                <h2>Mail Center</h2>
+                
+                <div id="mailStateAuth" style="max-width: 360px; margin: 60px auto 0 auto; background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="text-align: center; margin-bottom: 20px;">Sign in with Mail Account</h3>
+                    <form id="mailLoginForm">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="mailInputEmail" placeholder="username@gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="mailInputPassword" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-full">Sign In</button>
+                    </form>
+                </div>
+
+                <div id="mailStateDashboard" class="panel-full" style="display: none;">
+                    <div class="panel-header">
+                        <h3 id="mailDashboardTitle">Inbox</h3>
+                        <button class="btn btn-secondary" onclick="logoutMail()">Disconnect Account</button>
+                    </div>
+                    <div id="mailListContainer" class="scrollable-list">
                         </div>
                 </div>
             </div>
@@ -596,10 +630,7 @@
         <div class="modal-content">
             <h3>Create New Document</h3>
             <form id="documentForm" style="margin-top: 15px;">
-                <div class="form-group">
-                    <label>Document Title *</label>
-                    <input type="text" id="docTitle" placeholder="e.g. Report Summary" required>
-                </div>
+                <div class="form-group"><label>Document Title *</label><input type="text" id="docTitle" placeholder="e.g. Report Summary" required></div>
                 <div class="form-group">
                     <label>Font Styling / Weight</label>
                     <select id="docFontWeight">
@@ -609,14 +640,8 @@
                         <option value="underline">Underline Text</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Document Content Body *</label>
-                    <textarea id="docContent" rows="6" placeholder="Type text here..." required></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')">Cancel</button>
-                    <button type="submit" class="btn">Save Document</button>
-                </div>
+                <div class="form-group"><label>Document Content Body *</label><textarea id="docContent" rows="6" placeholder="Type text here..." required></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')">Cancel</button><button type="submit" class="btn">Save Document</button></div>
             </form>
         </div>
     </div>
@@ -665,7 +690,7 @@
             }
 
             const accessCode = generateUniqueToken('ID');
-            const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
+            const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [], mailAccount: null };
             localStorage.setItem('user_' + accessCode, JSON.stringify(userData));
 
             const codeResult = document.getElementById('codeResult');
@@ -697,7 +722,6 @@
             document.getElementById('editLastname').value = userData.lastname;
             document.getElementById('editEmail').value = userData.email;
 
-            // Integrity fallback arrays
             if(!userData.documents) userData.documents = [];
             localStorage.setItem('user_' + code, JSON.stringify(userData));
 
@@ -705,6 +729,7 @@
             updateMyNumbersDropdown();
             renderCompanyView();
             renderDocuments();
+            renderMailView();
 
             const firstBtn = document.querySelector('.nav-btn');
             switchPage('page-phone', firstBtn);
@@ -722,28 +747,17 @@
 
         /* --- 2.1 CONTACTS --- */
         function renderContacts() {
-            const container = document.getElementById('contactsContainer');
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            container.innerHTML = '';
-            if (!userData.contacts || userData.contacts.length === 0) {
-                container.innerHTML = '<div class="empty-placeholder">No contacts</div>'; return;
-            }
+            const container = document.getElementById('contactsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
+            if (!userData.contacts || userData.contacts.length === 0) { container.innerHTML = '<div class="empty-placeholder">No contacts</div>'; return; }
             userData.contacts.forEach(c => {
                 const card = document.createElement('div'); card.className = 'item-card';
-                card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`;
-                container.appendChild(card);
+                card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`; container.appendChild(card);
             });
         }
-
         document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            userData.contacts.push({
-                firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value,
-                code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value
-            });
-            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-            closeModal('contactModal'); this.reset(); renderContacts();
+            e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            userData.contacts.push({ firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value, code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value });
+            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); closeModal('contactModal'); this.reset(); renderContacts();
         });
 
         /* --- 2.2 CALLING HARDWARE TUNNEL --- */
@@ -754,17 +768,13 @@
             for (let i = 0; i < 4; i++) {
                 let pseudoRandom = Math.abs(Math.sin(seed + i) * 10000000);
                 let num7Digits = Math.floor(pseudoRandom).toString().padEnd(7, '7').substring(0,7);
-                let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`;
-                select.appendChild(opt);
+                let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`; select.appendChild(opt);
             }
         }
         function openNumberRegModal() { generateDailyNumbersPool(); openModal('numberRegModal'); }
         function saveRegisteredNumber() {
-            const selectedNum = document.getElementById('regNumberPoolSelect').value;
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            if(!userData.registeredNumbers.includes(selectedNum)) {
-                userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown();
-            }
+            const selectedNum = document.getElementById('regNumberPoolSelect').value; const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            if(!userData.registeredNumbers.includes(selectedNum)) { userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown(); }
             closeModal('numberRegModal');
         }
         function updateMyNumbersDropdown() {
@@ -786,60 +796,41 @@
             } else {
                 document.getElementById('companyStateUnregistered').style.display = 'none'; document.getElementById('companyStateDashboard').style.display = 'flex';
                 const globalCompanyData = JSON.parse(localStorage.getItem('company_' + userData.companyId)); if(!globalCompanyData) return;
-
                 document.getElementById('compDashboardName').textContent = globalCompanyData.name;
                 document.getElementById('compDashboardAddress').textContent = globalCompanyData.address || 'No Address Provided';
                 document.getElementById('compDashboardBio').textContent = globalCompanyData.bio;
                 const logoBox = document.getElementById('compDashboardLogo');
                 if (globalCompanyData.logo) logoBox.innerHTML = `<img src="${globalCompanyData.logo}" class="company-logo-preview" alt="logo">`; else logoBox.innerHTML = '🏢';
-
                 if (userData.companyRole === 'Administrator') { document.getElementById('compSettingsBtn').style.display = 'block'; } else {
                     const matchedRoleObj = globalCompanyData.roles.find(r => r.title === userData.companyRole);
-                    if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block';
-                    else document.getElementById('compSettingsBtn').style.display = 'none';
+                    if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block'; else document.getElementById('compSettingsBtn').style.display = 'none';
                 }
                 const membersContainer = document.getElementById('companyMembersContainer'); membersContainer.innerHTML = '';
-                globalCompanyData.members.forEach(m => {
-                    const card = document.createElement('div'); card.className = 'item-card';
-                    card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card);
-                });
+                globalCompanyData.members.forEach(m => { const card = document.createElement('div'); card.className = 'item-card'; card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card); });
             }
         }
         document.getElementById('companyCreateForm').addEventListener('submit', function(e) {
             e.preventDefault(); const compId = generateUniqueToken('COMP'); const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            const companyPayload = {
-                id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value,
-                bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [],
-                members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }]
-            };
-            localStorage.setItem('company_' + compId, JSON.stringify(companyPayload));
-            userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+            const companyPayload = { id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value, bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [], members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }] };
+            localStorage.setItem('company_' + compId, JSON.stringify(companyPayload)); userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
             closeModal('companyCreateModal'); this.reset(); renderCompanyView();
         });
         document.getElementById('companyJoinForm').addEventListener('submit', function(e) {
             e.preventDefault(); const inputtedToken = document.getElementById('joinCompCode').value.trim(); let foundCompany = null;
-            for(let key in localStorage) {
-                if(key.startsWith('company_')) {
-                    let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; }
-                }
-            }
+            for(let key in localStorage) { if(key.startsWith('company_')) { let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; } } }
             if(!foundCompany) { alert('Invalid Workspace Token!'); return; }
-            const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
-            localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany));
-            userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+            const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
+            localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany)); userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
             closeModal('companyJoinForm'); this.reset(); renderCompanyView();
         });
         function openCompanySettingsModal() {
             const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-            document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address;
-            document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
+            document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address; document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
             document.getElementById('inviteCodeDisplay').style.display = 'none'; openModal('companySettingsModal');
         }
         function saveCompanyProfileChanges() {
             const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-            companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value;
-            companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
+            companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value; companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
             localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); renderCompanyView(); alert('Profile updated!');
         }
         function generateCompanyInviteToken() {
@@ -851,68 +842,80 @@
         function createCustomRole() {
             const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
             const title = document.getElementById('newRoleTitle').value.trim(); if(!title) return;
-            companyData.roles.push({
-                title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked
-            });
+            companyData.roles.push({ title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked });
             localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); document.getElementById('newRoleTitle').value = ''; alert(`Role ${title} Created.`);
         }
 
         /* --- 4. DOCUMENTS ARCHITECTURE --- */
         function renderDocuments() {
-            const container = document.getElementById('documentsContainer');
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            container.innerHTML = '';
-
-            if (!userData.documents || userData.documents.length === 0) {
-                container.innerHTML = '<div class="empty-placeholder">No documents available</div>';
-                return;
-            }
-
+            const container = document.getElementById('documentsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
+            if (!userData.documents || userData.documents.length === 0) { container.innerHTML = '<div class="empty-placeholder">No documents available</div>'; return; }
             userData.documents.forEach(doc => {
-                const card = document.createElement('div');
-                card.className = 'item-card';
-
-                // Determine CSS style mutations based on font configuration nodes
+                const card = document.createElement('div'); card.className = 'item-card';
                 let styleInline = '';
-                if(doc.style === 'bold') styleInline = 'font-weight: bold;';
-                if(doc.style === 'italic') styleInline = 'font-style: italic;';
-                if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
-
-                card.innerHTML = `
-                    <h4>${doc.title}</h4>
-                    <p style="${styleInline}">${doc.content}</p>
-                `;
-                container.appendChild(card);
+                if(doc.style === 'bold') styleInline = 'font-weight: bold;'; if(doc.style === 'italic') styleInline = 'font-style: italic;'; if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
+                card.innerHTML = `<h4>${doc.title}</h4><p style="${styleInline}">${doc.content}</p>`; container.appendChild(card);
             });
         }
-
         document.getElementById('documentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-
-            const newDocPayload = {
-                title: document.getElementById('docTitle').value,
-                style: document.getElementById('docFontWeight').value,
-                content: document.getElementById('docContent').value
-            };
-
-            if(!userData.documents) userData.documents = [];
-            userData.documents.push(newDocPayload);
-            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-
-            closeModal('documentModal');
-            this.reset();
-            renderDocuments();
+            e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            const newDocPayload = { title: document.getElementById('docTitle').value, style: document.getElementById('docFontWeight').value, content: document.getElementById('docContent').value };
+            if(!userData.documents) userData.documents = []; userData.documents.push(newDocPayload); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+            closeModal('documentModal'); this.reset(); renderDocuments();
         });
+
+        /* --- 5. MAIL NETWORK CORE --- */
+        function renderMailView() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            if (!userData.mailAccount) {
+                document.getElementById('mailStateAuth').style.display = 'block';
+                document.getElementById('mailStateDashboard').style.display = 'none';
+            } else {
+                document.getElementById('mailStateAuth').style.display = 'none';
+                document.getElementById('mailStateDashboard').style.display = 'block';
+                document.getElementById('mailDashboardTitle').textContent = `Inbox (${userData.mailAccount})`;
+
+                const container = document.getElementById('mailListContainer');
+                container.innerHTML = `
+                    <div class="item-card">
+                        <h4>Welcome to your Workspace System</h4>
+                        <p style="color: gray; font-size:12px; margin-bottom: 5px;">From: system-noreply@dashboard.internal</p>
+                        <p>Your integrated mailbox configuration node has connected successfully.</p>
+                    </div>
+                    <div class="item-card">
+                        <h4>Security Alert: New Sign-in</h4>
+                        <p style="color: gray; font-size:12px; margin-bottom: 5px;">From: security@service.com</p>
+                        <p>An authorized connection mapping transaction was registered for your profile matrix.</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('mailLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emailValue = document.getElementById('mailInputEmail').value.trim();
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            
+            userData.mailAccount = emailValue;
+            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+            
+            this.reset();
+            renderMailView();
+        });
+
+        function logoutMail() {
+            const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+            userData.mailAccount = null;
+            localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+            renderMailView();
+        }
 
 
         /* --- GLOBAL CONTROL SYSTEM --- */
         document.getElementById('editProfileForm').addEventListener('submit', function(e) {
             e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-            userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value;
-            userData.email = document.getElementById('editEmail').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
+            userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value; userData.email = document.getElementById('editEmail').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
         });
-
         function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('site-theme', themeName); }
         function logout() { sessionStorage.removeItem('currentClientCode'); currentAccountCode = null; document.getElementById('mainApp').style.display = 'none'; document.getElementById('loginForm').reset(); showAuthPage('register'); }
     </script>
