@@ -1,4 +1,4 @@
-/* --- ПЕРЕМЕННЫЕ И ТЕМЫ ОФОРМЛЕНИЯ --- */
+/* --- СИСТЕМНЫЕ ПЕРЕМЕННЫЕ И ТЕМЫ ОФОРМЛЕНИЯ --- */
 :root {
     --bg-color: #ffffff;
     --text-color: #333333;
@@ -25,7 +25,7 @@
     --accent-color: #4285f4;
 }
 
-/* --- СБРОС СТИЛЕЙ --- */
+/* --- СБРОС СТИЛЕЙ ДЛЯ ОДНОРОДНОСТИ --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -41,10 +41,10 @@ body {
     overflow: hidden;
 }
 
-/* --- AUTH & SETUP WINDOWS --- */
+/* --- AUTH SCREENS (ВХОД И РЕГИСТРАЦИЯ) --- */
 .auth-container {
     max-width: 420px;
-    margin: 80px auto;
+    margin: 100px auto;
     padding: 30px;
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
@@ -59,9 +59,9 @@ body {
 }
 
 .auth-container p {
-    font-size: 13px;
+    font-size: 14px;
     color: gray;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     line-height: 1.4;
 }
 
@@ -70,17 +70,17 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-/* --- ГЛАВНЫЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ --- */
-.app-container {
-    display: none; /* Переключается на flex через JS после авторизации */
+/* --- ГЛАВНАЯ СТРУКТУРА ИНТЕРФЕЙСА (ДВУХПАНЕЛЬНАЯ) --- */
+.app-wrapper {
+    display: none; /* Переключается скриптом в 'flex' после авторизации */
     height: 100vh;
     width: 100vw;
 }
 
-/* --- SIDEBAR (БОКОВАЯ ПАНЕЛЬ) --- */
+/* Левое меню (Sidebar) */
 .sidebar {
     width: 280px;
     background-color: var(--sidebar-bg);
@@ -91,7 +91,8 @@ body {
     flex-shrink: 0;
 }
 
-.profile-card {
+/* Блок профиля в сайдбаре */
+.profile-section {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -101,8 +102,8 @@ body {
 }
 
 .user-avatar-preview {
-    width: 48px;
-    height: 48px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     background-color: var(--input-bg);
     border: 1px solid var(--border-color);
@@ -116,7 +117,17 @@ body {
     flex-shrink: 0;
 }
 
-.sidebar-nav {
+.profile-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+/* Навигационные кнопки в меню */
+.nav-menu {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -166,44 +177,44 @@ body {
     stroke: var(--accent-color);
 }
 
-/* --- ОСНОВНОЙ КОНТЕНТ (VIEWPORT) --- */
-.main-content {
+/* Правая контентная область (Viewport) */
+.content-viewport {
     flex: 1;
     padding: 35px;
     overflow-y: auto;
     background-color: var(--bg-color);
 }
 
-.page-node {
+.page {
     display: none;
     flex-direction: column;
     height: 100%;
 }
 
-.page-node.active {
+.page.active {
     display: flex;
 }
 
-.module-header {
+.page-header {
     margin-bottom: 25px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--border-color);
 }
 
-.module-header h2 {
+.page-header h2 {
     font-size: 22px;
     font-weight: 600;
 }
 
-/* --- СЕТКИ И ПАНЕЛИ (WORKSPACES) --- */
-.workspace-grid {
+/* --- СЕТКИ СТРАНИЦ КАНАЛОВ И МОДУЛЕЙ (SPLIT-VIEW) --- */
+.split-view {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     align-items: start;
 }
 
-.control-panel {
+.view-card {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 10px;
@@ -212,7 +223,7 @@ body {
     flex-direction: column;
 }
 
-.control-panel h3 {
+.view-card h3 {
     font-size: 16px;
     margin-bottom: 15px;
     font-weight: 600;
@@ -220,15 +231,15 @@ body {
     padding-bottom: 8px;
 }
 
-/* --- ФОРМЫ И ПОЛЯ ВВОДА --- */
+/* --- ФОРМЫ, ПОЛЯ ВВОДА И ТЕКСТОВЫЕ ЗОНЫ --- */
 .form-group {
     text-align: left;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     margin-bottom: 6px;
     text-transform: uppercase;
@@ -256,12 +267,7 @@ body {
     border-color: var(--accent-color);
 }
 
-.phone-input-container {
-    display: flex;
-    gap: 10px;
-}
-
-/* --- КНОПКИ --- */
+/* --- ИНТЕРФЕЙСНЫЕ КНОПКИ --- */
 .btn {
     padding: 10px 20px;
     background: var(--btn-bg);
@@ -286,7 +292,7 @@ body {
     background: #ffffff;
     color: #3c4043;
     border: 1px solid #dadce0;
-    padding: 12px 24px;
+    padding: 11px 24px;
     font-weight: 500;
     border-radius: 6px;
     cursor: pointer;
@@ -296,7 +302,6 @@ body {
     font-size: 14px;
     box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
     transition: background 0.2s, box-shadow 0.2s;
-    margin-top: 10px;
 }
 
 #btn-google-login:hover {
@@ -304,7 +309,7 @@ body {
     box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
 }
 
-/* --- МОДАЛЬНЫЕ ОКНА --- */
+/* --- ОКНА ПОВЕРХ ЭКРАНА (MODALS) --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -330,16 +335,10 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
-/* --- СПИСКИ И ЭЛЕМЕНТЫ ДАННЫХ --- */
-.data-stream-container {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-top: 10px;
-}
-
+/* --- Списки (Контакты, почта и т.д.) --- */
 .list-item {
     display: flex;
     justify-content: space-between;
@@ -354,13 +353,13 @@ body {
 .empty-placeholder {
     text-align: center;
     color: gray;
-    padding: 40px 20px;
-    font-size: 13px;
+    padding: 50px 20px;
+    font-size: 14px;
     border: 2px dashed var(--border-color);
     border-radius: 8px;
 }
 
-/* GMAIL ИНТЕРФЕЙС */
+/* Почтовые ячейки */
 .email-item {
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-color);
