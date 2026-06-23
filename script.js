@@ -1,367 +1,1033 @@
-// --- КОНФИГУРАЦИЯ GOOGLE AUTH ---
-const CLIENT_ID = '565975442884-sea3ig36td6ofhsd2932oo8rjcp7j5kl.apps.googleusercontent.com';
-const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly';
-let tokenClient;
-let accessToken = null;
+// --- СЛОВАРЬ ЛОКАЛИЗАЦИИ (i18n) ---
+		const i18n = {
+			en: {
+				appTitle: "Interactive Dashboard",
+				authDesc: "For secure login and automatic synchronization with your corporate mail, log in using your Google account.",
+				googleLoginBtn: "Log In via Google",
+				setupTitle: "Complete Registration",
+				setupDesc: "Please provide your details to build a worker profile.",
+				uploadLogoLabel: "Profile Logo / Avatar",
+				firstNameLabel: "First Name",
+				lastNameLabel: "Last Name",
+				ageLabel: "Age",
+				ageErrorMsg: "Registration is only allowed for ages 7 and older!",
+				createProfileBtn: "Create Profile",
+				phoneTitle: "Phone Interface",
+				contactsHeader: "Contacts",
+				createContactBtn: "Create Contact",
+				makeCallHeader: "Make a Call",
+				registerNumberBtn: "Register Number",
+				destinationLabel: "Enter destination number",
+				callBtn: "Call",
+				companyTitle: "Company Hub",
+				unregisteredCompany: "Not registered in any company",
+				choiceCompanyBtn: "Register / Join Company",
+				membersDirectory: "Members Directory",
+				workspaceActions: "Workspace Actions",
+				addWidgetsBtn: "Add Widgets",
+				companySettingsBtn: "Company Settings",
+				workspacePlaceholder: "Select an action above to manage your corporate assets.",
+				documentsTitle: "Documents Panel",
+				createDocumentBtn: "Create Document",
+				mailTitle: "Gmail Portal",
+				syncMail: "Mail synchronization...",
+				composeMailBtn: "✏️ Compose",
+				settingsTitle: "Settings",
+				appThemeTitle: "App Theme",
+				themeLight: "Light",
+				themeDark: "Dark",
+				appLanguageTitle: "App Language",
+				personalInfoTitle: "Personal Information",
+				emailLabel: "Email Address",
+				saveChangesBtn: "Save Changes",
+				logOutBtn: "Log Out",
+				newMsgTitle: "New Message",
+				mailToLabel: "To *",
+				mailSubjectLabel: "Subject",
+				mailBodyLabel: "Message Text *",
+				cancelBtn: "Cancel",
+				sendBtn: "Send",
+				mailFromLabel: "From:",
+				replyBtn: "↩️ Reply",
+				quickReplyTitle: "Quick Reply",
+				closeBtn: "Close",
+				sendReplyBtn: "Send Reply",
+				createContactModalTitle: "Create New Contact",
+				phoneNumberLabel: "Phone Number *",
+				saveContactBtn: "Save Contact",
+				registerVirtualNumberTitle: "Register Virtual Number",
+				selectRegionLabel: "Select Region",
+				chooseNumberLabel: "Choose a Number",
+				registerBtn: "Register",
+				companyHubRegistryTitle: "Company Hub Registry",
+				createCompanyBtn: "Create Company",
+				joinCompanyBtn: "Join Existing Company",
+				establishCompanyTitle: "Establish New Company",
+				companyNameLabel: "Company Name *",
+				companyAddressLabel: "Company Address",
+				companyBioLabel: "Company Bio *",
+				logoUrlLabel: "Logo URL",
+				createLaunchBtn: "Create & Launch",
+				joinCorporateTitle: "Join Corporate Network",
+				enterTokenLabel: "Enter Corporate Token",
+				authenticateBtn: "Authenticate",
+				corporateControlTitle: "Corporate Control Center",
+				modifyProfileHeader: "Modify Profile",
+				applyUpdatesBtn: "Apply Profile Updates",
+				accessTokensHeader: "Access Tokens",
+				generateInviteBtn: "Generate Invitation Code",
+				roleArchitectureHeader: "Role Architecture Config",
+				roleTitleLabel: "Role Title",
+				permEditProfileLabel: "Allow Profile Modification",
+				permEditRolesLabel: "Allow Role Modifications",
+				permAddWidgetsLabel: "Allow Extension/Widget Deployment",
+				deployRoleBtn: "Deploy Custom Role",
+				dismissBtn: "Dismiss",
+				widgetEcosystemTitle: "Widget Ecosystem Extension",
+				underDevelopment: "[ UNDER DEVELOPMENT ]",
+				createNewDocTitle: "Create New Document",
+				docTitleLabel: "Document Title *",
+				docFontLabel: "Font Styling / Weight",
+				docContentLabel: "Document Content Body *",
+				saveDocBtn: "Save Document",
+                noContacts: "No contacts",
+                noDocs: "No documents available"
+			},
+			ru: {
+				appTitle: "Интерактивная Панель",
+				authDesc: "Для безопасного входа и автоматической синхронизации с вашей корпоративной почтой авторизуйтесь через Google-аккаунт.",
+				googleLoginBtn: "Войти через Google",
+				setupTitle: "Завершение регистрации",
+				setupDesc: "Пожалуйста, укажите ваши данные для создания рабочего профиля.",
+				uploadLogoLabel: "Логотип / Аватар профиля",
+				firstNameLabel: "Имя",
+				lastNameLabel: "Фамилия",
+				ageLabel: "Возраст",
+				ageErrorMsg: "Регистрация разрешена только с 7 лет!",
+				createProfileBtn: "Создать профиль",
+				phoneTitle: "Телефонный интерфейс",
+				contactsHeader: "Контакты",
+				createContactBtn: "Создать контакт",
+				makeCallHeader: "Совершить звонок",
+				registerNumberBtn: "Регистрация номера",
+				destinationLabel: "Введите номер назначения",
+				callBtn: "Позвонить",
+				companyTitle: "Центр Компании",
+				unregisteredCompany: "Не зарегистрирован ни в одной компании",
+				choiceCompanyBtn: "Создать / Войти в компанию",
+				membersDirectory: "Список участников",
+				workspaceActions: "Действия рабочей среды",
+				addWidgetsBtn: "Добавить виджеты",
+				companySettingsBtn: "Настройки компании",
+				workspacePlaceholder: "Выберите действие выше для управления корпоративными активами.",
+				documentsTitle: "Панель документов",
+				createDocumentBtn: "Создать документ",
+				mailTitle: "Портал Gmail",
+				syncMail: "Синхронизация почты...",
+				composeMailBtn: "✏️ Написать",
+				settingsTitle: "Настройки",
+				appThemeTitle: "Тема приложения",
+				themeLight: "Светлая",
+				themeDark: "Темная",
+				appLanguageTitle: "Язык приложения",
+				personalInfoTitle: "Личная информация",
+				emailLabel: "Email адрес",
+				saveChangesBtn: "Сохранить изменения",
+				logOutBtn: "Выйти из системы",
+				newMsgTitle: "Новое сообщение",
+				mailToLabel: "Кому *",
+				mailSubjectLabel: "Тема",
+				mailBodyLabel: "Текст сообщения *",
+				cancelBtn: "Отмена",
+				sendBtn: "Отправить",
+				mailFromLabel: "От:",
+				replyBtn: "↩️ Ответить",
+				quickReplyTitle: "Быстрый ответ",
+				closeBtn: "Закрыть",
+				sendReplyBtn: "Отправить ответ",
+				createContactModalTitle: "Создать новый контакт",
+				phoneNumberLabel: "Номер телефона *",
+				saveContactBtn: "Сохранить контакт",
+				registerVirtualNumberTitle: "Регистрация виртуального номера",
+				selectRegionLabel: "Выберите регион",
+				chooseNumberLabel: "Выберите номер",
+				registerBtn: "Зарегистрировать",
+				companyHubRegistryTitle: "Реестр Центра Компаний",
+				createCompanyBtn: "Создать компанию",
+				joinCompanyBtn: "Присоединиться к компании",
+				establishCompanyTitle: "Основать новую компанию",
+				companyNameLabel: "Название компании *",
+				companyAddressLabel: "Адрес компании",
+				companyBioLabel: "Описание компании *",
+				logoUrlLabel: "Ссылка на логотип",
+				createLaunchBtn: "Создать и запустить",
+				joinCorporateTitle: "Присоединиться к корпоративной сети",
+				enterTokenLabel: "Введите корпоративный токен",
+				authenticateBtn: "Аутентификация",
+				corporateControlTitle: "Корпоративный центр управления",
+				modifyProfileHeader: "Изменить профиль",
+				applyUpdatesBtn: "Применить обновления",
+				accessTokensHeader: "Токены доступа",
+				generateInviteBtn: "Создать код приглашения",
+				roleArchitectureHeader: "Конфигурация архитектуры ролей",
+				roleTitleLabel: "Название роли",
+				permEditProfileLabel: "Разрешить изменение профиля",
+				permEditRolesLabel: "Разрешить изменение ролей",
+				permAddWidgetsLabel: "Разрешить развертывание виджетов",
+				deployRoleBtn: "Развернуть кастомную роль",
+				dismissBtn: "Закрыть",
+				widgetEcosystemTitle: "Расширение экосистемы виджетов",
+				underDevelopment: "[ В РАЗРАБОТКЕ ]",
+				createNewDocTitle: "Создать новый документ",
+				docTitleLabel: "Название документа *",
+				docFontLabel: "Стиль шрифта / Начертание",
+				docContentLabel: "Тело содержимого документа *",
+				saveDocBtn: "Сохранить документ",
+                noContacts: "Нет контактов",
+                noDocs: "Нет доступных документов"
+			},
+			he: {
+				appTitle: "לוח בקרה אינטראקטיבי",
+				authDesc: "לכניסה מאובטחת וסנכרון אוטומטי עם הדוא\"ל הארגוני שלך, התחבר באמצעות חשבון הגוגל שלך.",
+				googleLoginBtn: "התחבר באמצעות Google",
+				setupTitle: "השלמת הרשמה",
+				setupDesc: "אנא ספק את הפרטים שלך כדי לבנות פרופיל עובד.",
+				uploadLogoLabel: "לוגו / אווטאר פרופיל",
+				firstNameLabel: "שם פרטי",
+				lastNameLabel: "שם משפחה",
+				ageLabel: "גיל",
+				ageErrorMsg: "הרשמה מותרת מגיל 7 ומעלה בלבד!",
+				createProfileBtn: "צור פרופיל",
+				phoneTitle: "ממשק טלפון",
+				contactsHeader: "אנשי קשר",
+				createContactBtn: "צור איש קשר",
+				makeCallHeader: "בצע שיחה",
+				registerNumberBtn: "רשום מספר",
+				destinationLabel: "הזן מספר יעד",
+				callBtn: "התקשר",
+				companyTitle: "מרכז החברה",
+				unregisteredCompany: "לא רשום באף חברה",
+				choiceCompanyBtn: "הרשמה / הצטרפות לחברה",
+				membersDirectory: "ספריית חברים",
+				workspaceActions: "פעולות סביבת עבודה",
+				addWidgetsBtn: "הוסף ווידג'טים",
+				companySettingsBtn: "הגדרות חברה",
+				workspacePlaceholder: "בחר פעולה שלמעלה כדי לנהל את הנכסים הארגוניים שלך.",
+				documentsTitle: "פאנל מסמכים",
+				createDocumentBtn: "צור מסמך",
+				mailTitle: "פורטל Gmail",
+				syncMail: "סנכרון דואר...",
+				composeMailBtn: "✏️ כתוב הודעה",
+				settingsTitle: "הגדרות",
+				appThemeTitle: "נושא האפליקציה",
+				themeLight: "בהיר",
+				themeDark: "כהה",
+				appLanguageTitle: "שפת האפליקציה",
+				personalInfoTitle: "מידע אישי",
+				emailLabel: "כתובת אימייל",
+				saveChangesBtn: "שמור שינויים",
+				logOutBtn: "התנתק",
+				newMsgTitle: "הודעה חדשה",
+				mailToLabel: "אל *",
+				mailSubjectLabel: "נושא",
+				mailBodyLabel: "תוכן ההודעה *",
+				cancelBtn: "ביטול",
+				sendBtn: "שלח",
+				mailFromLabel: "מאת:",
+				replyBtn: "↩️ השב",
+				quickReplyTitle: "תגובה מהירה",
+				closeBtn: "סגור",
+				sendReplyBtn: "שלח תגובה",
+				createContactModalTitle: "צור איש קשר חדש",
+				phoneNumberLabel: "מספר טלפון *",
+				saveContactBtn: "שמור איש קשר",
+				registerVirtualNumberTitle: "רישום מספר וירטואלי",
+				selectRegionLabel: "בחר אזור",
+				chooseNumberLabel: "בחר מספר",
+				registerBtn: "הרשם",
+				companyHubRegistryTitle: "רישום מרכז החברה",
+				createCompanyBtn: "צור חברה",
+				joinCompanyBtn: "הצטרף לחברה קיימת",
+				establishCompanyTitle: "הקם חברה חדשה",
+				companyNameLabel: "שם החברה *",
+				companyAddressLabel: "כתובת החברה",
+				companyBioLabel: "תיאור החברה *",
+				logoUrlLabel: "קישור ללוגו",
+				createLaunchBtn: "צור והשקע",
+				joinCorporateTitle: "הצטרף לרשת הארגונית",
+				enterTokenLabel: "הזן אסימון ארגוני",
+				authenticateBtn: "אמת",
+				corporateControlTitle: "מרכז בקרה ארגוני",
+				modifyProfileHeader: "עדכן פרופיל",
+				applyUpdatesBtn: "החל עדכוני פרופיל",
+				accessTokensHeader: "אסימוני גישה",
+				generateInviteBtn: "צור קוד הזמנה",
+				roleArchitectureHeader: "תצורת ארכיטקטורת תפקידים",
+				roleTitleLabel: "שם התפקיד",
+				permEditProfileLabel: "אפשר שינוי פרופיל",
+				permEditRolesLabel: "אפשר שינוי תפקידים",
+				permAddWidgetsLabel: "אפשר פריסת ווידג'טים",
+				deployRoleBtn: "פרוס תפקיד מותאם אישית",
+				dismissBtn: "סגור",
+				widgetEcosystemTitle: "הרחבת מערכת הווידג'טים",
+				underDevelopment: "[ בפתיוח ]",
+				createNewDocTitle: "צור מסמך חדש",
+				docTitleLabel: "כותרת המסמך *",
+				docFontLabel: "סגנון גופן / משקל",
+				docContentLabel: "גוף תוכן המסמך *",
+				saveDocBtn: "שמור מסמך",
+                noContacts: "אין אנשי קשר",
+                noDocs: "אין מסמכים זמינים"
+			},
+			ar: {
+				appTitle: "لوحة التحكم التفاعلية",
+				authDesc: "لتسجيل الدخول الآمن والمزامنة التلقائية مع بريدك الإلكتروني المؤسسي، يرجى تسجيل الدخول باستخدام حساب Google الخاص بك.",
+				googleLoginBtn: "تسجيل الدخول عبر Google",
+				setupTitle: "إكمال التسجيل",
+				setupDesc: "يرجى تقديم التفاصيل الخاصة بك لإنشاء ملف تعريف العمل.",
+				uploadLogoLabel: "شعار / صورة الملف الشخصي",
+				firstNameLabel: "الاسم الأول",
+				lastNameLabel: "اسم العائلة",
+				ageLabel: "العمر",
+				ageErrorMsg: "التسجيل متاح فقط للأعمار من 7 سنوات فما فوق!",
+				createProfileBtn: "إنشاء ملف التعريف",
+				phoneTitle: "واجهة الهاتف",
+				contactsHeader: "جهات الاتصال",
+				createContactBtn: "إنشاء جهة اتصال",
+				makeCallHeader: "إجراء مكالمة",
+				registerNumberBtn: "تسجيل الرقم",
+				destinationLabel: "أدخل الرقم المطلوب",
+				callBtn: "اتصال",
+				companyTitle: "مركز الشركة",
+				unregisteredCompany: "غير مسجل في أي شركة",
+				choiceCompanyBtn: "تسجيل / الانضمام إلى شركة",
+				membersDirectory: "دليل الأعضاء",
+				workspaceActions: "إجراءات مساحة العمل",
+				addWidgetsBtn: "إضافة أدوات",
+				companySettingsBtn: "إعدادات الشركة",
+				workspacePlaceholder: "حدد إجراءً أعلاه لإدارة أصول الشركة الخاصة بك.",
+				documentsTitle: "لوحة المستندات",
+				createDocumentBtn: "إنشاء مستند",
+				mailTitle: "بوابة Gmail",
+				syncMail: "مزامنة البريد...",
+				composeMailBtn: "✏️ إنشاء رسالة",
+				settingsTitle: "الإعدادات",
+				appThemeTitle: "مظهر التطبيق",
+				themeLight: "فاتح",
+				themeDark: "داكن",
+				appLanguageTitle: "لغة التطبيق",
+				personalInfoTitle: "المعلومات الشخصية",
+				emailLabel: "البريد الإلكتروني",
+				saveChangesBtn: "حفظ التغييرات",
+				logOutBtn: "تسجيل الخروج",
+				newMsgTitle: "رسالة جديدة",
+				mailToLabel: "إلى *",
+				mailSubjectLabel: "الموضوع",
+				mailBodyLabel: "نص الرسالة *",
+				cancelBtn: "إلغاء",
+				sendBtn: "إرسال",
+				mailFromLabel: "من:",
+				replyBtn: "↩️ رد",
+				quickReplyTitle: "رد سريع",
+				closeBtn: "إغلاق",
+				sendReplyBtn: "إرسال الرد",
+				createContactModalTitle: "إنشاء جهة اتصال جديدة",
+				phoneNumberLabel: "رقم الهاتف *",
+				saveContactBtn: "حفظ جهة الاتصال",
+				registerVirtualNumberTitle: "تسجيل رقم افتراضي",
+				selectRegionLabel: "اختر المنطقة",
+				chooseNumberLabel: "اختر الرقم",
+				registerBtn: "تسجيل",
+				companyHubRegistryTitle: "سجل مركز الشركة",
+				createCompanyBtn: "إنشاء شركة",
+				joinCompanyBtn: "الانضمام إلى شركة قائمة",
+				establishCompanyTitle: "تأسيس شركة جديدة",
+				companyNameLabel: "اسم الشركة *",
+				companyAddressLabel: "عنوان الشركة",
+				companyBioLabel: "وصف الشركة *",
+				logoUrlLabel: "رابط الشعار",
+				createLaunchBtn: "إنشاء وإطلاق",
+				joinCorporateTitle: "الانضمام إلى شبكة الشركات",
+				enterTokenLabel: "أدخل رمز الشركة",
+				authenticateBtn: "مصادقة",
+				corporateControlTitle: "مركز التحكم في الشركة",
+				modifyProfileHeader: "تعديل الملف الشخصي",
+				applyUpdatesBtn: "تطبيق التحديثات",
+				accessTokensHeader: "رموز الوصول",
+				generateInviteBtn: "توليد رمز الدعوة",
+				roleArchitectureHeader: "تكوين بنية الأدوار",
+				roleTitleLabel: "عنوان الدور",
+				permEditProfileLabel: "السماح بتعديل الملف الشخصي",
+				permEditRolesLabel: "السماح بتعديل الأدوار",
+				permAddWidgetsLabel: "السماح بنشر الأدوات",
+				deployRoleBtn: "نشر دور مخصص",
+				dismissBtn: "إلغاء",
+				widgetEcosystemTitle: "توسيع منظومة الأدوات",
+				underDevelopment: "[ قيد التطوير ]",
+				createNewDocTitle: "إنشاء مستند جديد",
+				docTitleLabel: "عنوان المستند *",
+				docFontLabel: "تنسيق الخط / الوزن",
+				docContentLabel: "نص محتوى المستند *",
+				saveDocBtn: "حفظ المستند",
+                noContacts: "لا توجد جهات اتصال",
+                noDocs: "لا توجد مستندات متاحة"
+			},
+			es: {
+				appTitle: "Tablero Interactivo",
+				authDesc: "Para un inicio de sesión seguro y sincronización automática con su correo corporativo, inicie sesión con su cuenta de Google.",
+				googleLoginBtn: "Iniciar sesión con Google",
+				setupTitle: "Completar Registro",
+				setupDesc: "Por favor, proporcione sus datos para crear un perfil de trabajo.",
+				uploadLogoLabel: "Logotipo / Avatar del perfil",
+				firstNameLabel: "Nombre",
+				lastNameLabel: "Apellido",
+				ageLabel: "Edad",
+				ageErrorMsg: "¡El registro solo se permite para mayores de 7 años!",
+				createProfileBtn: "Crear perfil",
+				phoneTitle: "Interfaz Telefónica",
+				contactsHeader: "Contactos",
+				createContactBtn: "Crear Contacto",
+				makeCallHeader: "Hacer una llamada",
+				registerNumberBtn: "Registrar Número",
+				destinationLabel: "Ingrese el número de destino",
+				callBtn: "Llamar",
+				companyTitle: "Centro de la Compañía",
+				unregisteredCompany: "No registrado en ninguna compañía",
+				choiceCompanyBtn: "Registrar / Unirse a Compañía",
+				membersDirectory: "Directorio de Miembros",
+				workspaceActions: "Acciones del espacio de trabajo",
+				addWidgetsBtn: "Agregar Widgets",
+				companySettingsBtn: "Configuración de la empresa",
+				workspacePlaceholder: "Seleccione una acción anterior para administrar sus activos corporativos.",
+				documentsTitle: "Panel de Documentos",
+				createDocumentBtn: "Crear Documento",
+				mailTitle: "Portal de Gmail",
+				syncMail: "Sincronización de correo...",
+				composeMailBtn: "✏️ Redactar",
+				settingsTitle: "Configuración",
+				appThemeTitle: "Tema de la aplicación",
+				themeLight: "Claro",
+				themeDark: "Oscuro",
+				appLanguageTitle: "Idioma de la aplicación",
+				personalInfoTitle: "Información Personal",
+				emailLabel: "Correo Electrónico",
+				saveChangesBtn: "Guardar Cambios",
+				logOutBtn: "Cerrar Sesión",
+				newMsgTitle: "Nuevo Mensaje",
+				mailToLabel: "Para *",
+				mailSubjectLabel: "Asunto",
+				mailBodyLabel: "Texto del Mensaje *",
+				cancelBtn: "Cancelar",
+				sendBtn: "Enviar",
+				mailFromLabel: "De:",
+				replyBtn: "↩️ Responder",
+				quickReplyTitle: "Respuesta Rápida",
+				closeBtn: "Cerrar",
+				sendReplyBtn: "Enviar Respuesta",
+				createContactModalTitle: "Crear Nuevo Contacto",
+				phoneNumberLabel: "Número de Teléfono *",
+				saveContactBtn: "Guardar Contacto",
+				registerVirtualNumberTitle: "Registrar Número Virtual",
+				selectRegionLabel: "Seleccionar Región",
+				chooseNumberLabel: "Elegir un Número",
+				registerBtn: "Registrar",
+				companyHubRegistryTitle: "Registro de Centro de Compañías",
+				createCompanyBtn: "Crear Compañía",
+				joinCompanyBtn: "Unirse a Compañía Existente",
+				establishCompanyTitle: "Establecer Nueva Compañía",
+				companyNameLabel: "Nombre de la Compañía *",
+				companyAddressLabel: "Dirección de la Compañía",
+				companyBioLabel: "Descripción de la Compañía *",
+				logoUrlLabel: "URL del Logotipo",
+				createLaunchBtn: "Crear y Lanzar",
+				joinCorporateTitle: "Unirse a la Red Corporativa",
+				enterTokenLabel: "Ingrese el Token Corporativo",
+				authenticateBtn: "Autenticar",
+				corporateControlTitle: "Centro de Control Corporativo",
+				modifyProfileHeader: "Modificar Perfil",
+				applyUpdatesBtn: "Aplicar Actualizaciones",
+				accessTokensHeader: "Tokens de Acceso",
+				generateInviteBtn: "Generar Código de Invitación",
+				roleArchitectureHeader: "Configuración de Roles",
+				roleTitleLabel: "Título del Rol",
+				permEditProfileLabel: "Permitir Modificación de Perfil",
+				permEditRolesLabel: "Permitir Modificación de Roles",
+				permAddWidgetsLabel: "Permitir Despliegue de Widgets",
+				deployRoleBtn: "Desplegar Rol Personalizado",
+				dismissBtn: "Descartar",
+				widgetEcosystemTitle: "Extensión del Ecosistema de Widgets",
+				underDevelopment: "[ EN DESARROLLO ]",
+				createNewDocTitle: "Crear Nuevo Documento",
+				docTitleLabel: "Título del Documento *",
+				docFontLabel: "Estilo de Fuente / Peso",
+				docContentLabel: "Cuerpo del Documento *",
+				saveDocBtn: "Guardar Documento",
+                noContacts: "No hay contactos",
+                noDocs: "No hay documentos disponibles"
+			},
+			fr: {
+				appTitle: "Tableau de Bord Interactif",
+				authDesc: "Pour une connexion sécurisée et une synchronisation automatique avec votre messagerie d'entreprise, connectez-vous avec votre compte Google.",
+				googleLoginBtn: "Se connecter via Google",
+				setupTitle: "Compléter l'inscription",
+				setupDesc: "Veuillez fournir vos coordonnées для создания профиля.",
+				uploadLogoLabel: "Logo / Avatar du profil",
+				firstNameLabel: "Prénom",
+				lastNameLabel: "Nom",
+				ageLabel: "Âge",
+				ageErrorMsg: "L'inscription est autorisée uniquement pour les personnes de 7 ans et plus !",
+				createProfileBtn: "Créer le profil",
+				phoneTitle: "Interface Téléphonique",
+				contactsHeader: "Contacts",
+				createContactBtn: "Créer un contact",
+				makeCallHeader: "Passer un appel",
+				registerNumberBtn: "Enregistrer un numéro",
+				destinationLabel: "Entrez le numéro de destination",
+				callBtn: "Appeler",
+				companyTitle: "Centre de l'Entreprise",
+				unregisteredCompany: "Non inscrit dans une entreprise",
+				choiceCompanyBtn: "Créer / Rejoindre une entreprise",
+				membersDirectory: "Répertoire des membres",
+				workspaceActions: "Actions de l'espace de travail",
+				addWidgetsBtn: "Ajouter des widgets",
+				companySettingsBtn: "Paramètres de l'entreprise",
+				workspacePlaceholder: "Sélectionnez une action ci-dessus pour gérer vos actifs d'entreprise.",
+				documentsTitle: "Panneau des Documents",
+				createDocumentBtn: "Créer un document",
+				mailTitle: "Portail Gmail",
+				syncMail: "Synchronisation de la messagerie...",
+				composeMailBtn: "✏️ Rédiger",
+				settingsTitle: "Paramètres",
+				appThemeTitle: "Thème de l'application",
+				themeLight: "Clair",
+				themeDark: "Sombre",
+				appLanguageTitle: "Langue de l'application",
+				personalInfoTitle: "Informations Personnelles",
+				emailLabel: "Adresse e-mail",
+				saveChangesBtn: "Enregistrer les modifications",
+				logOutBtn: "Se déconnecter",
+				newMsgTitle: "Nouveau Message",
+				mailToLabel: "À *",
+				mailSubjectLabel: "Objet",
+				mailBodyLabel: "Corps du message *",
+				cancelBtn: "Annuler",
+				sendBtn: "Envoyer",
+				mailFromLabel: "De :",
+				replyBtn: "↩️ Répondre",
+				quickReplyTitle: "Réponse Rapide",
+				closeBtn: "Fermer",
+				sendReplyBtn: "Envoyer la réponse",
+				createContactModalTitle: "Créer un nouveau contact",
+				phoneNumberLabel: "Numéro de téléphone *",
+				saveContactBtn: "Enregistrer le contact",
+				registerVirtualNumberTitle: "Enregistrer un numéro virtuel",
+				selectRegionLabel: "Sélectionner la région",
+				chooseNumberLabel: "Choisir un numéro",
+				registerBtn: "S'inscrire",
+				companyHubRegistryTitle: "Registre du Centre d'Entreprise",
+				createCompanyBtn: "Créer une entreprise",
+				joinCompanyBtn: "Rejoindre une entreprise existante",
+				establishCompanyTitle: "Créer une nouvelle entreprise",
+				companyNameLabel: "Nom de l'entreprise *",
+				companyAddressLabel: "Adresse de l'entreprise",
+				companyBioLabel: "Description de l'entreprise *",
+				logoUrlLabel: "URL du logo",
+				createLaunchBtn: "Créer & Lancer",
+				joinCorporateTitle: "Rejoindre le réseau d'entreprise",
+				enterTokenLabel: "Entrez le jeton d'entreprise",
+				authenticateBtn: "Authentifier",
+				corporateControlTitle: "Centre de contrôle de l'entreprise",
+				modifyProfileHeader: "Modifier le profil",
+				applyUpdatesBtn: "Appliquer les mises à jour",
+				accessTokensHeader: "Jetons d'accès",
+				generateInviteBtn: "Générer un code d'invitation",
+				roleArchitectureHeader: "Configuration des rôles",
+				roleTitleLabel: "Titre du rôle",
+				permEditProfileLabel: "Autoriser la modification du profil",
+				permEditRolesLabel: "Autoriser la modification des rôles",
+				permAddWidgetsLabel: "Autoriser le déploiement de widgets",
+				deployRoleBtn: "Déployer le rôle personnalisé",
+				dismissBtn: "Fermer",
+				widgetEcosystemTitle: "Extension de l'écosystème de widgets",
+				underDevelopment: "[ EN DÉVELOPPEMENT ]",
+				createNewDocTitle: "Créer un nouveau document",
+				docTitleLabel: "Titre du document *",
+				docFontLabel: "Style de police / Poids",
+				docContentLabel: "Corps du document *",
+				saveDocBtn: "Enregistrer le document",
+                noContacts: "Aucun contact",
+                noDocs: "Aucun document disponible"
+			}
+		};
 
-let currentAccountCode = null;
+		// --- КОНФИГУРАЦИЯ GOOGLE AUTH ---
+		const CLIENT_ID = '565975442884-sea3ig36td6ofhsd2932oo8rjcp7j5kl.apps.googleusercontent.com';
+		const SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
+		
+        let tokenClient;
+		let accessToken = null;
+		let currentAccountCode = null; 
+        let selectedGmailMsg = null;
+        let tempGoogleEmail = null;
+        let base64AvatarData = null; // Для хранения картинки логотипа в Base64
 
-window.onload = function() {
-    const savedTheme = localStorage.getItem('site-theme') || 'light';
-    setTheme(savedTheme);
-    const sessionCode = sessionStorage.getItem('currentClientCode');
-    if (sessionCode && localStorage.getItem('user_' + sessionCode)) {
-        loginToApp(sessionCode);
-    }
-};
+		window.onload = function() {
+			const savedTheme = localStorage.getItem('site-theme') || 'light';
+			setTheme(savedTheme);
+            
+            // Инициализация языка
+            const savedLang = localStorage.getItem('site-lang') || 'en';
+            changeLanguage(savedLang);
+            
+            initGoogleAuth();
+            setupAvatarListeners();
+		};
 
-// Инициализация Google Identity Services при входе в приложение
-function initGoogleAuth() {
-    const script = document.createElement('script');
-    script.src = "https://accounts.google.com/gsi/client";
-    script.onload = () => {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID,
-            scope: SCOPES,
-            callback: (tokenResponse) => {
-                if (tokenResponse && tokenResponse.access_token) {
-                    accessToken = tokenResponse.access_token;
-                    document.getElementById('auth-block').style.display = 'none';
-                    document.getElementById('emails-block').style.display = 'block';
+        // Логика переключения языков
+        function changeLanguage(lang) {
+            localStorage.setItem('site-lang', lang);
+            document.getElementById('langSelect').value = lang;
+            
+            // Если выбран Иврит или Арабский — включаем RTL режим чтения справа налево
+            if (lang === 'he' || lang === 'ar') {
+                document.body.classList.add('rtl');
+            } else {
+                document.body.classList.remove('rtl');
+            }
+            
+            // Переводим все элементы с атрибутом data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = i18n[lang][key];
+                    } else {
+                        el.textContent = i18n[lang][key];
+                    }
+                }
+            });
+
+            // Перерисовываем списки, так как плейсхолдеры внутри функций тоже зависят от языка
+            if(currentAccountCode) {
+                renderContacts();
+                renderDocuments();
+                renderCompanyView();
+            }
+        }
+
+        // Слушатель загрузки картинок (FileReader)
+        function setupAvatarListeners() {
+            const handleAvatarFile = (e, previewId) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        base64AvatarData = event.target.result;
+                        document.getElementById(previewId).innerHTML = `<img src="${base64AvatarData}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            document.getElementById('setupAvatarInput').onchange = (e) => handleAvatarFile(e, 'setupAvatarPreview');
+            document.getElementById('editAvatarInput').onchange = (e) => {
+                handleAvatarFile(e, 'editAvatarPreview');
+                // Если меняем аватар в настройках, сразу даем возможность сохранить изменения
+                const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+                if (userData) {
+                    userData.avatar = base64AvatarData;
+                    localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+                    updateSidebarAndSettingsAvatar(base64AvatarData);
+                }
+            };
+        }
+
+		function initGoogleAuth() {
+			const script = document.createElement('script');
+			script.src = "https://accounts.google.com/gsi/client";
+			script.onload = () => {
+				tokenClient = google.accounts.oauth2.initTokenClient({
+					client_id: CLIENT_ID,
+					scope: SCOPES,
+					callback: async (tokenResponse) => {
+						if (tokenResponse && tokenResponse.access_token) {
+							accessToken = tokenResponse.access_token;
+							await handleGoogleAuthSuccess();
+						}
+					},
+				});
+				setupGmailButtons();
+			};
+			document.head.appendChild(script);
+		}
+
+		function setupGmailButtons() {
+			const loginBtn = document.getElementById('btn-google-login');
+			if (loginBtn) {
+				loginBtn.onclick = () => {
+					tokenClient.requestAccessToken({ prompt: 'consent' });
+				};
+			}
+            document.getElementById('gmailComposeForm').onsubmit = async (e) => { e.preventDefault(); await sendGmailMessage(); };
+            document.getElementById('gmailReplyForm').onsubmit = async (e) => { e.preventDefault(); await sendGmailReply(); };
+		}
+
+        async function handleGoogleAuthSuccess() {
+            try {
+                const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
+					headers: { 'Authorization': `Bearer ${accessToken}` }
+				});
+				const profile = await profileRes.json();
+                const userEmail = profile.emailAddress;
+                tempGoogleEmail = userEmail;
+
+                if (localStorage.getItem('user_' + userEmail)) {
+                    completeLogin(userEmail);
+                } else {
+                    document.getElementById('authWindow').style.display = 'none';
+                    document.getElementById('setupProfileWindow').style.display = 'block';
+                }
+            } catch (err) {
+                alert('Google Auth Error: ' + err.message);
+            }
+        }
+
+        document.getElementById('profileSetupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const firstname = document.getElementById('setupFirstname').value;
+			const lastname = document.getElementById('setupLastname').value;
+			const age = parseInt(document.getElementById('setupAge').value);
+
+			if (age < 7) {
+				document.getElementById('ageSetupError').style.display = 'block';
+				return;
+			}
+
+            const userData = { firstname, lastname, age, email: tempGoogleEmail, avatar: base64AvatarData, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
+			localStorage.setItem('user_' + tempGoogleEmail, JSON.stringify(userData));
+            
+            document.getElementById('setupProfileWindow').style.display = 'none';
+            completeLogin(tempGoogleEmail);
+        });
+
+        function updateSidebarAndSettingsAvatar(avatarData) {
+            const currentLang = localStorage.getItem('site-lang') || 'en';
+            const blocks = [document.getElementById('sidebarAvatar'), document.getElementById('editAvatarPreview')];
+            blocks.forEach(block => {
+                if(block) {
+                    if (avatarData) {
+                        block.innerHTML = `<img src="${avatarData}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                    } else {
+                        block.textContent = "👤";
+                    }
+                }
+            });
+        }
+
+        function completeLogin(email) {
+            currentAccountCode = email;
+            document.getElementById('authWindow').style.display = 'none';
+			document.getElementById('mainApp').style.display = 'flex';
+			
+			const userData = JSON.parse(localStorage.getItem('user_' + email));
+			document.getElementById('editFirstname').value = userData.firstname;
+			document.getElementById('editLastname').value = userData.lastname;
+			document.getElementById('editEmail').value = userData.email;
+
+            // Рендерим аватарку пользователя
+            base64AvatarData = userData.avatar || null;
+            updateSidebarAndSettingsAvatar(base64AvatarData);
+
+			renderContacts();
+			updateMyNumbersDropdown();
+			renderCompanyView();
+			renderDocuments();
+			loadGmailData();
+
+			const firstBtn = document.querySelector('.nav-btn');
+			switchPage('page-phone', firstBtn);
+        }
+
+		async function loadGmailData() {
+			try {
+				const userEmailEl = document.getElementById('user-email');
+				if (userEmailEl) userEmailEl.textContent = currentAccountCode;
+
+				const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5', {
+					headers: { 'Authorization': `Bearer ${accessToken}` }
+				});
+				const data = await res.json();
+				const container = document.getElementById('emails-list');
+				if (!container) return;
+				container.innerHTML = '';
+
+				if (!data.messages || data.messages.length === 0) {
+					container.innerHTML = '<p style="text-align:center; padding:20px;">No messages found.</p>';
+					return;
+				}
+
+				for (let msg of data.messages) {
+					const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
+						headers: { 'Authorization': `Bearer ${accessToken}` }
+					});
+					const detail = await detailRes.json();
+					const headers = detail.payload.headers;
+					const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+					const from = headers.find(h => h.name === 'From')?.value || 'Unknown Sender';
+                    const messageId = headers.find(h => h.name === 'Message-ID')?.value || '';
+
+                    let parsedBody = "";
+                    if (detail.payload.body && detail.payload.body.data) {
+                        parsedBody = atob(detail.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                    } else if (detail.payload.parts) {
+                        const textPart = detail.payload.parts.find(p => p.mimeType === 'text/plain' || p.mimeType === 'text/html');
+                        if (textPart && textPart.body && textPart.body.data) {
+                            parsedBody = atob(textPart.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                        }
+                    }
+                    if(!parsedBody) parsedBody = detail.snippet || "";
+
+                    const emailData = { id: detail.id, threadId: detail.threadId, messageId: messageId, subject: subject, from: from, body: parsedBody };
+
+					const card = document.createElement('div');
+					card.style.cssText = 'padding: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); text-align: left; cursor: pointer; transition: background 0.2s;';
+					
+                    card.onclick = () => openGmailViewModal(emailData);
+                    card.innerHTML = `
+						<div style="color: var(--accent-color); font-weight: bold; font-size: 13px;">${from.split('<')[0]}</div>
+						<div style="font-weight: 600; margin: 4px 0; color: var(--text-color);">${subject}</div>
+						<div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${detail.snippet || ''}</div>
+					`;
+					container.appendChild(card);
+				}
+			} catch (err) {
+				console.error('Gmail API Error:', err);
+			}
+		}
+
+        async function sendGmailMessage() {
+            const to = document.getElementById('gmailTo').value;
+            const subject = document.getElementById('gmailSubject').value;
+            const body = document.getElementById('gmailBody').value;
+
+            const emailContent = [
+                `To: ${to}`,
+                `Subject: =?utf-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+                'Content-Type: text/plain; charset="UTF-8"',
+                '',
+                body
+            ].join('\n');
+
+            const base64EncodedEmail = btoa(unescape(encodeURIComponent(emailContent))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+            try {
+                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ raw: base64EncodedEmail })
+                });
+                if (response.ok) {
+                    alert('Success!');
+                    closeModal('gmailComposeModal');
+                    document.getElementById('gmailComposeForm').reset();
                     loadGmailData();
                 }
-            },
-        });
-        
-        // Привязываем события к кнопкам Gmail после загрузки скрипта Google
-        setupGmailButtons();
-    };
-    document.head.appendChild(script);
-}
+            } catch (err) { alert(err.message); }
+        }
 
-function setupGmailButtons() {
-    const loginBtn = document.getElementById('btn-login');
-    const logoutBtn = document.getElementById('btn-logout');
+        function openGmailViewModal(email) {
+            selectedGmailMsg = email;
+            document.getElementById('gmailViewSubject').textContent = email.subject;
+            document.getElementById('gmailViewFrom').textContent = email.from;
+            document.getElementById('gmailViewBody').textContent = email.body;
+            document.getElementById('gmailReplyForm').style.display = 'none';
+            document.getElementById('gmailReplyBtn').style.display = 'inline-block';
+            openModal('gmailViewModal');
+        }
 
-    if (loginBtn) {
-        loginBtn.onclick = () => {
-            tokenClient.requestAccessToken({ prompt: 'consent' });
-        };
-    }
-    if (logoutBtn) {
-        logoutBtn.onclick = () => {
+        function showGmailReplyForm() {
+            document.getElementById('gmailReplyForm').style.display = 'block';
+            document.getElementById('gmailReplyBtn').style.display = 'none';
+        }
+
+        async function sendGmailReply() {
+            if (!selectedGmailMsg) return;
+            const replyBody = document.getElementById('gmailReplyBody').value;
+            let toEmail = selectedGmailMsg.from;
+            const match = selectedGmailMsg.from.match(/<([^>]+)>/);
+            if (match && match[1]) toEmail = match[1];
+
+            const subject = selectedGmailMsg.subject.startsWith('Re:') ? selectedGmailMsg.subject : `Re: ${selectedGmailMsg.subject}`;
+            let emailHeaders = [ `To: ${toEmail}`, `Subject: =?utf-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`, 'Content-Type: text/plain; charset="UTF-8"' ];
+
+            if (selectedGmailMsg.messageId) {
+                emailHeaders.push(`In-Reply-To: ${selectedGmailMsg.messageId}`);
+                emailHeaders.push(`References: ${selectedGmailMsg.messageId}`);
+            }
+            emailHeaders.push('', replyBody);
+
+            const emailContent = emailHeaders.join('\n');
+            const base64EncodedEmail = btoa(unescape(encodeURIComponent(emailContent))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+            try {
+                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ raw: base64EncodedEmail, threadId: selectedGmailMsg.threadId })
+                });
+                if (response.ok) {
+                    closeModal('gmailViewModal');
+                    loadGmailData();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+		function switchPage(pageId, buttonElement) {
+			document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+			document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+			document.getElementById(pageId).classList.add('active');
+			if(buttonElement) buttonElement.classList.add('active');
+		}
+
+		function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+		function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+		/* --- CONTACTS --- */
+		function renderContacts() {
+            const currentLang = localStorage.getItem('site-lang') || 'en';
+			const container = document.getElementById('contactsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
+			if (!userData.contacts || userData.contacts.length === 0) { container.innerHTML = `<div class="empty-placeholder">${i18n[currentLang].noContacts}</div>`; return; }
+			userData.contacts.forEach(c => {
+				const card = document.createElement('div'); card.className = 'item-card';
+				card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`; container.appendChild(card);
+			});
+		}
+		document.getElementById('contactForm').addEventListener('submit', function(e) {
+			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			userData.contacts.push({ firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value, code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value });
+			localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); closeModal('contactModal'); this.reset(); renderContacts();
+		});
+
+		/* --- VIRTUAL NUMBERSPool --- */
+		function generateDailyNumbersPool() {
+			const region = document.getElementById('regNumberRegion').value;
+			const select = document.getElementById('regNumberPoolSelect'); select.innerHTML = '';
+			const seed = new Date().toDateString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+			for (let i = 0; i < 4; i++) {
+				let pseudoRandom = Math.abs(Math.sin(seed + i) * 10000000);
+				let num7Digits = Math.floor(pseudoRandom).toString().padEnd(7, '7').substring(0,7);
+				let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`; select.appendChild(opt);
+			}
+		}
+		function openNumberRegModal() { generateDailyNumbersPool(); openModal('numberRegModal'); }
+		function saveRegisteredNumber() {
+			const selectedNum = document.getElementById('regNumberPoolSelect').value; const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			if(!userData.registeredNumbers.includes(selectedNum)) { userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown(); }
+			closeModal('numberRegModal');
+		}
+		function updateMyNumbersDropdown() {
+			const select = document.getElementById('myNumbersSelect'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); select.innerHTML = '';
+			if(!userData.registeredNumbers || userData.registeredNumbers.length === 0) { select.innerHTML = '<option value="">No active number</option>'; return; }
+			userData.registeredNumbers.forEach(num => { let opt = document.createElement('option'); opt.value = num; opt.textContent = num; select.appendChild(opt); });
+		}
+		function makeCall() {
+			const activeLine = document.getElementById('myNumbersSelect').value;
+			if (!activeLine) { alert('Call not processed. You must register and select an active virtual number first!'); return; }
+			alert(`Dialing from line [${activeLine}] to [${document.getElementById('dialNumberInput').value}]...\nConnection active!`);
+		}
+
+		/* --- COMPANY NETWORK --- */
+		function renderCompanyView() {
+			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			if (!userData.companyId) {
+				document.getElementById('companyStateUnregistered').style.display = 'block'; document.getElementById('companyStateDashboard').style.display = 'none';
+			} else {
+				document.getElementById('companyStateUnregistered').style.display = 'none'; document.getElementById('companyStateDashboard').style.display = 'flex';
+				const globalCompanyData = JSON.parse(localStorage.getItem('company_' + userData.companyId)); if(!globalCompanyData) return;
+				document.getElementById('compDashboardName').textContent = globalCompanyData.name;
+				document.getElementById('compDashboardAddress').textContent = globalCompanyData.address || 'No Address Provided';
+				document.getElementById('compDashboardBio').textContent = globalCompanyData.bio;
+				const logoBox = document.getElementById('compDashboardLogo');
+				if (globalCompanyData.logo) logoBox.innerHTML = `<img src="${globalCompanyData.logo}" class="company-logo-preview" alt="logo">`; else logoBox.innerHTML = '🏢';
+				if (userData.companyRole === 'Administrator') { document.getElementById('compSettingsBtn').style.display = 'block'; } else {
+					const matchedRoleObj = globalCompanyData.roles.find(r => r.title === userData.companyRole);
+					if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block'; else document.getElementById('compSettingsBtn').style.display = 'none';
+				}
+				const membersContainer = document.getElementById('companyMembersContainer'); membersContainer.innerHTML = '';
+				globalCompanyData.members.forEach(m => { const card = document.createElement('div'); card.className = 'item-card'; card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card); });
+			}
+		}
+		document.getElementById('companyCreateForm').addEventListener('submit', function(e) {
+			e.preventDefault(); const compId = 'COMP-' + Math.random().toString(36).substr(2, 9).toUpperCase(); const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			const companyPayload = { id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value, bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [], members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }] };
+			localStorage.setItem('company_' + compId, JSON.stringify(companyPayload)); userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+			closeModal('companyCreateModal'); this.reset(); renderCompanyView();
+		});
+		document.getElementById('companyJoinForm').addEventListener('submit', function(e) {
+			e.preventDefault(); const inputtedToken = document.getElementById('joinCompCode').value.trim(); let foundCompany = null;
+			for(let key in localStorage) { if(key.startsWith('company_')) { let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; } } }
+			if(!foundCompany) { alert('Invalid Workspace Token!'); return; }
+			const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
+			localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany)); userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
+			closeModal('companyJoinForm'); this.reset(); renderCompanyView();
+		});
+		function openCompanySettingsModal() {
+			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+			document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address; document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
+			document.getElementById('inviteCodeDisplay').style.display = 'none'; openModal('companySettingsModal');
+		}
+		function saveCompanyProfileChanges() {
+			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+			companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value; companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
+			localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); renderCompanyView(); alert('Profile updated!');
+		}
+		function generateCompanyInviteToken() {
+			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+			if(!companyData.activeInviteTokens) companyData.activeInviteTokens = []; const generatedToken = 'TOKEN-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+			companyData.activeInviteTokens.push(generatedToken); localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData));
+			const display = document.getElementById('inviteCodeDisplay'); display.textContent = generatedToken; display.style.display = 'block';
+		}
+		function createCustomRole() {
+			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
+			const title = document.getElementById('newRoleTitle').value.trim(); if(!title) return;
+			companyData.roles.push({ title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked });
+			localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); document.getElementById('newRoleTitle').value = ''; alert(`Role ${title} Created.`);
+		}
+
+		/* --- DOCUMENTS ARCHITECTURE --- */
+		function renderDocuments() {
+            const currentLang = localStorage.getItem('site-lang') || 'en';
+			const container = document.getElementById('documentsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
+			if (!userData.documents || userData.documents.length === 0) { container.innerHTML = `<div class="empty-placeholder">${i18n[currentLang].noDocs}</div>`; return; }
+			userData.documents.forEach(doc => {
+				const card = document.createElement('div'); card.className = 'item-card';
+				let styleInline = '';
+				if(doc.style === 'bold') styleInline = 'font-weight: bold;'; if(doc.style === 'italic') styleInline = 'font-style: italic;'; if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
+				card.innerHTML = `<h4>${doc.title}</h4><p style="${styleInline}">${doc.content}</p>`; container.appendChild(card);
+			});
+		}
+		document.getElementById('documentForm').addEventListener('submit', function(e) {
+			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			const newDocPayload = { title: document.getElementById('docTitle').value, style: document.getElementById('docFontWeight').value, content: document.getElementById('docContent').value };
+			if(!userData.documents) userData.documents = []; userData.documents.push(newDocPayload); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
+			closeModal('documentModal'); this.reset(); renderDocuments();
+		});
+
+		/* --- GLOBAL CONTROL SYSTEM --- */
+		document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
+			userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
+		});
+		function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('site-theme', themeName); }
+		
+        function logout() { 
             if (accessToken) {
                 google.accounts.oauth2.revoke(accessToken, () => {
                     accessToken = null;
-                    document.getElementById('auth-block').style.display = 'block';
-                    document.getElementById('emails-block').style.display = 'none';
+                    currentAccountCode = null;
+                    document.getElementById('mainApp').style.display = 'none';
+                    document.getElementById('authWindow').style.display = 'block';
                     document.getElementById('emails-list').innerHTML = '';
                 });
             }
-        };
-    }
-}
-
-// Запрос данных из Gmail API
-async function loadGmailData() {
-    try {
-        // Получаем email профиля
-        const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        const profile = await profileRes.json();
-        const userEmailEl = document.getElementById('user-email');
-        if (userEmailEl) userEmailEl.textContent = profile.emailAddress;
-
-        // Получаем список из 5 последних писем
-        const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5', {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        const data = await res.json();
-        const container = document.getElementById('emails-list');
-        if (!container) return;
-        container.innerHTML = '';
-
-        if (!data.messages || data.messages.length === 0) {
-            container.innerHTML = '<p style="text-align:center; padding:20px;">Входящих писем не найдено.</p>';
-            return;
         }
-
-        // Загружаем детали по каждому письму
-        for (let msg of data.messages) {
-            const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-            const detail = await detailRes.json();
-            const headers = detail.payload.headers;
-            const subject = headers.find(h => h.name === 'Subject')?.value || 'Без темы';
-            const from = headers.find(h => h.name === 'From')?.value || 'Неизвестный отправитель';
-
-            const card = document.createElement('div');
-            card.style.cssText = 'padding: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); text-align: left;';
-            card.innerHTML = `
-                <div style="color: var(--accent-color); font-weight: bold; font-size: 13px;">${from.split('<')[0]}</div>
-                <div style="font-weight: 600; margin: 4px 0; color: var(--text-color);">${subject}</div>
-                <div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${detail.snippet || ''}</div>
-            `;
-            container.appendChild(card);
-        }
-    } catch (err) {
-        console.error('Ошибка Gmail API:', err);
-        const container = document.getElementById('emails-list');
-        if (container) container.innerHTML = '<p style="color:red; text-align:center;">Не удалось загрузить почту.</p>';
-    }
-}
-
-function showAuthPage(page) {
-    document.getElementById('ageError').style.display = 'none';
-    document.getElementById('loginError').style.display = 'none';
-    document.getElementById('codeResult').style.display = 'none';
-    if(page === 'login') {
-        document.getElementById('registerWindow').style.display = 'none';
-        document.getElementById('loginWindow').style.display = 'block';
-    } else {
-        document.getElementById('registerWindow').style.display = 'block';
-        document.getElementById('loginWindow').style.display = 'none';
-    }
-}
-
-function generateUniqueToken(prefix = 'ID') {
-    return prefix + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-}
-
-// Registration
-document.getElementById('regForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const firstname = document.getElementById('regFirstname').value;
-    const lastname = document.getElementById('regLastname').value;
-    const age = parseInt(document.getElementById('regAge').value);
-    const email = document.getElementById('regEmail').value;
-
-    if (age < 7) {
-        document.getElementById('ageError').style.display = 'block';
-        return;
-    }
-
-    const accessCode = generateUniqueToken('ID');
-    const userData = { firstname, lastname, age, email, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
-    localStorage.setItem('user_' + accessCode, JSON.stringify(userData));
-
-    const codeResult = document.getElementById('codeResult');
-    codeResult.innerHTML = `Success!<br>Your secret code: <span style="user-select:all; color:blue;">${accessCode}</span><br><small>Copy it to log in next time.</small>`;
-    codeResult.style.display = 'block';
-    this.reset();
-});
-
-// Login
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const code = document.getElementById('loginCode').value.trim();
-    if (localStorage.getItem('user_' + code)) {
-        sessionStorage.setItem('currentClientCode', code);
-        loginToApp(code);
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-    }
-});
-
-function loginToApp(code) {
-    currentAccountCode = code;
-    document.getElementById('registerWindow').style.display = 'none';
-    document.getElementById('loginWindow').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    
-    const userData = JSON.parse(localStorage.getItem('user_' + code));
-    document.getElementById('editFirstname').value = userData.firstname;
-    document.getElementById('editLastname').value = userData.lastname;
-    document.getElementById('editEmail').value = userData.email;
-
-    if(!userData.documents) userData.documents = [];
-    localStorage.setItem('user_' + code, JSON.stringify(userData));
-
-    renderContacts();
-    updateMyNumbersDropdown();
-    renderCompanyView();
-    renderDocuments();
-
-    // Инициализируем вход через Google, как только пользователь попал в приложение
-    initGoogleAuth();
-
-    const firstBtn = document.querySelector('.nav-btn');
-    switchPage('page-phone', firstBtn);
-}
-
-function switchPage(pageId, buttonElement) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    buttonElement.classList.add('active');
-}
-
-// Global modal handlers
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-// Explicitly declare globally for inline html call triggers
-window.openModal = openModal;
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-window.closeModal = closeModal;
-
-/* --- 2.1 CONTACTS --- */
-function renderContacts() {
-    const container = document.getElementById('contactsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
-    if (!userData.contacts || userData.contacts.length === 0) { container.innerHTML = '<div class="empty-placeholder">No contacts</div>'; return; }
-    userData.contacts.forEach(c => {
-        const card = document.createElement('div'); card.className = 'item-card';
-        card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`; container.appendChild(card);
-    });
-}
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    userData.contacts.push({ firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value, code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value });
-    localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); closeModal('contactModal'); this.reset(); renderContacts();
-});
-
-/* --- 2.2 CALLING HARDWARE TUNNEL --- */
-function generateDailyNumbersPool() {
-    const region = document.getElementById('regNumberRegion').value;
-    const select = document.getElementById('regNumberPoolSelect'); select.innerHTML = '';
-    const seed = new Date().toDateString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    for (let i = 0; i < 4; i++) {
-        let pseudoRandom = Math.abs(Math.sin(seed + i) * 10000000);
-        let num7Digits = Math.floor(pseudoRandom).toString().padEnd(7, '7').substring(0,7);
-        let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`; select.appendChild(opt);
-    }
-}
-window.generateDailyNumbersPool = generateDailyNumbersPool;
-
-function openNumberRegModal() { generateDailyNumbersPool(); openModal('numberRegModal'); }
-window.openNumberRegModal = openNumberRegModal;
-
-function saveRegisteredNumber() {
-    const selectedNum = document.getElementById('regNumberPoolSelect').value; const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    if(!userData.registeredNumbers.includes(selectedNum)) { userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown(); }
-    closeModal('numberRegModal');
-}
-window.saveRegisteredNumber = saveRegisteredNumber;
-
-function updateMyNumbersDropdown() {
-    const select = document.getElementById('myNumbersSelect'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); select.innerHTML = '';
-    if(!userData.registeredNumbers || userData.registeredNumbers.length === 0) { select.innerHTML = '<option value="">No active number</option>'; return; }
-    userData.registeredNumbers.forEach(num => { let opt = document.createElement('option'); opt.value = num; opt.textContent = num; select.appendChild(opt); });
-}
-function makeCall() {
-    const activeLine = document.getElementById('myNumbersSelect').value;
-    if (!activeLine) { alert('Call not processed. You must register and select an active virtual number first!'); return; }
-    alert(`Dialing from line [${activeLine}] to [${document.getElementById('dialNumberInput').value}]...\nConnection active!`);
-}
-window.makeCall = makeCall;
-
-/* --- 3. COMPANY NETWORK --- */
-function renderCompanyView() {
-    const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    if (!userData.companyId) {
-        document.getElementById('companyStateUnregistered').style.display = 'block'; document.getElementById('companyStateDashboard').style.display = 'none';
-    } else {
-        document.getElementById('companyStateUnregistered').style.display = 'none'; document.getElementById('companyStateDashboard').style.display = 'flex';
-        const globalCompanyData = JSON.parse(localStorage.getItem('company_' + userData.companyId)); if(!globalCompanyData) return;
-        document.getElementById('compDashboardName').textContent = globalCompanyData.name;
-        document.getElementById('compDashboardAddress').textContent = globalCompanyData.address || 'No Address Provided';
-        document.getElementById('compDashboardBio').textContent = globalCompanyData.bio;
-        
-        // Логика управления отображением логотипа компании вместо смайлика
-        const logoImg = document.getElementById('compDashboardLogoImg');
-        const logoPlaceholder = document.getElementById('compDashboardLogoPlaceholder');
-        if (globalCompanyData.logo) {
-            logoImg.src = globalCompanyData.logo;
-            logoImg.style.display = 'block';
-            logoPlaceholder.style.display = 'none';
-        } else {
-            logoImg.style.display = 'none';
-            logoPlaceholder.style.display = 'block';
-        }
-
-        if (userData.companyRole === 'Administrator') { document.getElementById('compSettingsBtn').style.display = 'block'; } else {
-            const matchedRoleObj = globalCompanyData.roles.find(r => r.title === userData.companyRole);
-            if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block'; else document.getElementById('compSettingsBtn').style.display = 'none';
-        }
-        const membersContainer = document.getElementById('companyMembersContainer'); membersContainer.innerHTML = '';
-        globalCompanyData.members.forEach(m => { const card = document.createElement('div'); card.className = 'item-card'; card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card); });
-    }
-}
-document.getElementById('companyCreateForm').addEventListener('submit', function(e) {
-    e.preventDefault(); const compId = generateUniqueToken('COMP'); const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    const companyPayload = { id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value, bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [], members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }] };
-    localStorage.setItem('company_' + compId, JSON.stringify(companyPayload)); userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
-    closeModal('companyCreateModal'); this.reset(); renderCompanyView();
-});
-document.getElementById('companyJoinForm').addEventListener('submit', function(e) {
-    e.preventDefault(); const inputtedToken = document.getElementById('joinCompCode').value.trim(); let foundCompany = null;
-    for(let key in localStorage) { if(key.startsWith('company_')) { let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; } } }
-    if(!foundCompany) { alert('Invalid Workspace Token!'); return; }
-    const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
-    localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany)); userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
-    closeModal('companyJoinForm'); this.reset(); renderCompanyView();
-});
-function openCompanySettingsModal() {
-    const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-    document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address; document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
-    document.getElementById('inviteCodeDisplay').style.display = 'none'; openModal('companySettingsModal');
-}
-window.openCompanySettingsModal = openCompanySettingsModal;
-
-function saveCompanyProfileChanges() {
-    const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-    companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value; companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
-    localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); renderCompanyView(); alert('Profile updated!');
-}
-window.saveCompanyProfileChanges = saveCompanyProfileChanges;
-
-function generateCompanyInviteToken() {
-    const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-    if(!companyData.activeInviteTokens) companyData.activeInviteTokens = []; const generatedToken = generateUniqueToken('TOKEN');
-    companyData.activeInviteTokens.push(generatedToken); localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData));
-    const display = document.getElementById('inviteCodeDisplay'); display.textContent = generatedToken; display.style.display = 'block';
-}
-window.generateCompanyInviteToken = generateCompanyInviteToken;
-
-function createCustomRole() {
-    const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-    const title = document.getElementById('newRoleTitle').value.trim(); if(!title) return;
-    companyData.roles.push({ title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked });
-    localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); document.getElementById('newRoleTitle').value = ''; alert(`Role ${title} Created.`);
-}
-window.createCustomRole = createCustomRole;
-
-/* --- 4. DOCUMENTS ARCHITECTURE --- */
-function renderDocuments() {
-    const container = document.getElementById('documentsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
-    if (!userData.documents || userData.documents.length === 0) { container.innerHTML = '<div class="empty-placeholder">No documents available</div>'; return; }
-    userData.documents.forEach(doc => {
-        const card = document.createElement('div'); card.className = 'item-card';
-        let styleInline = '';
-        if(doc.style === 'bold') styleInline = 'font-weight: bold;'; if(doc.style === 'italic') styleInline = 'font-style: italic;'; if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
-        card.innerHTML = `<h4>${doc.title}</h4><p style="${styleInline}">${doc.content}</p>`; container.appendChild(card);
-    });
-}
-document.getElementById('documentForm').addEventListener('submit', function(e) {
-    e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    const newDocPayload = { title: document.getElementById('docTitle').value, style: document.getElementById('docFontWeight').value, content: document.getElementById('docContent').value };
-    if(!userData.documents) userData.documents = []; userData.documents.push(newDocPayload); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-    closeModal('documentModal'); this.reset(); renderDocuments();
-});
-
-/* --- GLOBAL CONTROL SYSTEM --- */
-document.getElementById('editProfileForm').addEventListener('submit', function(e) {
-    e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-    userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value; userData.email = document.getElementById('editEmail').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
-});
-function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('site-theme', themeName); }
-window.setTheme = setTheme;
-
-function logout() { sessionStorage.removeItem('currentClientCode'); currentAccountCode = null; accessToken = null; document.getElementById('mainApp').style.display = 'none'; document.getElementById('loginForm').reset(); showAuthPage('register'); }
-window.logout = logout;
-
-function showAuthPageGlobal(page) { showAuthPage(page); }
-window.showAuthPage = showAuthPageGlobal;
-
-function switchPageGlobal(pageId, btn) { switchPage(pageId, btn); }
-window.switchPage = switchPageGlobal;
