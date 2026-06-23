@@ -39,11 +39,14 @@ body {
     transition: background 0.3s, color 0.3s;
     height: 100vh;
     width: 100vw;
-    position: relative; /* Изменено, чтобы absolute внутри позиционировался относительно body */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
-/* --- ОКНА АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (ФИКС ПЕРЕКРЫТИЯ) --- */
+/* --- ОКНА АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (РЕШЕНИЕ ПРОБЛЕМЫ КЛИКА) --- */
 .auth-container {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
@@ -53,21 +56,31 @@ body {
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     
-    /* Идеальное центрирование */
+    /* Центрируем блоки независимо друг от друга */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 5;
 }
 
-/* КРИТИЧЕСКИЙ ФИКС: Если окно скрыто через display: none, оно НЕ должно перехватывать клики мыши */
-#authWindow[style*="display: none"],
+/* ГЛАВНЫЙ ФИКС: Если у элемента стоит style="display: none;", мы полностью отключаем для него чтение мышкой */
+#authWindow[style*="display: none"], 
 #setupProfileWindow[style*="display: none"],
-#mainApp[style*="display: none"] {
+#mainApp[style*="display: none"],
+div[style*="display: none"] {
     display: none !important;
     pointer-events: none !important;
     visibility: hidden !important;
+    opacity: 0 !important;
+    z-index: -100 !important;
+}
+
+/* Принудительно выводим активное окно авторизации вперед */
+#authWindow {
+    z-index: 10;
+}
+#setupProfileWindow {
+    z-index: 20;
 }
 
 .auth-container h2 {
@@ -90,13 +103,13 @@ body {
 
 /* --- СТРУКТУРА ПРИЛОЖЕНИЯ ПОСЛЕ ВХОДА (#mainApp) --- */
 #mainApp {
-    display: none; /* Переключается в flex скриптом */
+    display: none;
     width: 100vw;
     height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 30;
 }
 
 /* Сайдбар */
@@ -170,7 +183,7 @@ body {
     stroke: var(--accent-color);
 }
 
-/* Правая часть с контентом */
+/* Контент справа */
 .main-content {
     flex: 1;
     padding: 20px;
@@ -192,7 +205,7 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Сетки модулей */
+/* Сетки */
 .workspace-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -213,7 +226,7 @@ body {
     padding-bottom: 5px;
 }
 
-/* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ ФОРМ И КНОПКИ --- */
+/* --- ВНУТРЕННИЕ ПОЛЯ ФОРМ И КНОПКИ --- */
 #profileSetupForm div, .control-panel div {
     margin-bottom: 12px;
     text-align: left;
@@ -265,6 +278,7 @@ body {
     color: white;
 }
 
+/* Кнопка войти через Google */
 #btn-google-login {
     background: #ffffff;
     color: #3c4043;
@@ -278,7 +292,7 @@ body {
     gap: 10px;
     justify-content: center;
     position: relative;
-    z-index: 10; /* Кнопка точно сверху */
+    z-index: 100 !important; /* Гарантированно поверх всего в окне входа */
 }
 
 /* --- МОДАЛЬНЫЕ ОКНА --- */
