@@ -321,3 +321,18 @@ body {
 }
 .email-item:hover { background: var(--sidebar-bg); }
 .email-item-unread { font-weight: bold; background: rgba(26,115,232,0.05); }
+
+
+/* Фикс перекрытия кликов скрытыми окнами */
+#setupProfileWindow[style*="display: none"],
+#mainApp[style*="display: none"],
+.modal-overlay[style*="display: none"] {
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+#btn-google-login {
+    position: relative;
+    z-index: 20 !important; /* Поднимаем кнопку выше всех фоновых слоев */
+    cursor: pointer !important;
+}
