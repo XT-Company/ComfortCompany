@@ -43,10 +43,9 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    position: relative;
 }
 
-/* --- ОКНА АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (РЕШЕНИЕ ПРОБЛЕМЫ КЛИКА) --- */
+/* --- ОКНА АВТОРИЗАЦИИ (ВХОД И РЕГИСТРАЦИЯ) --- */
 .auth-container {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
@@ -55,32 +54,6 @@ body {
     width: 400px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    
-    /* Центрируем блоки независимо друг от друга */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-/* ГЛАВНЫЙ ФИКС: Если у элемента стоит style="display: none;", мы полностью отключаем для него чтение мышкой */
-#authWindow[style*="display: none"], 
-#setupProfileWindow[style*="display: none"],
-#mainApp[style*="display: none"],
-div[style*="display: none"] {
-    display: none !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    z-index: -100 !important;
-}
-
-/* Принудительно выводим активное окно авторизации вперед */
-#authWindow {
-    z-index: 10;
-}
-#setupProfileWindow {
-    z-index: 20;
 }
 
 .auth-container h2 {
@@ -103,13 +76,11 @@ div[style*="display: none"] {
 
 /* --- СТРУКТУРА ПРИЛОЖЕНИЯ ПОСЛЕ ВХОДА (#mainApp) --- */
 #mainApp {
-    display: none;
     width: 100vw;
     height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 30;
 }
 
 /* Сайдбар */
@@ -183,7 +154,7 @@ div[style*="display: none"] {
     stroke: var(--accent-color);
 }
 
-/* Контент справа */
+/* Правая часть с контентом */
 .main-content {
     flex: 1;
     padding: 20px;
@@ -205,7 +176,7 @@ div[style*="display: none"] {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Сетки */
+/* Сетки модулей */
 .workspace-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -226,7 +197,7 @@ div[style*="display: none"] {
     padding-bottom: 5px;
 }
 
-/* --- ВНУТРЕННИЕ ПОЛЯ ФОРМ И КНОПКИ --- */
+/* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ ФОРМ И КНОПКИ --- */
 #profileSetupForm div, .control-panel div {
     margin-bottom: 12px;
     text-align: left;
@@ -278,7 +249,6 @@ div[style*="display: none"] {
     color: white;
 }
 
-/* Кнопка войти через Google */
 #btn-google-login {
     background: #ffffff;
     color: #3c4043;
@@ -291,8 +261,6 @@ div[style*="display: none"] {
     align-items: center;
     gap: 10px;
     justify-content: center;
-    position: relative;
-    z-index: 100 !important; /* Гарантированно поверх всего в окне входа */
 }
 
 /* --- МОДАЛЬНЫЕ ОКНА --- */
