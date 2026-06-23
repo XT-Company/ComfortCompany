@@ -38,13 +38,12 @@ body {
     color: var(--text-color);
     transition: background 0.3s, color 0.3s;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100vw;
+    position: relative; /* Изменено, чтобы absolute внутри позиционировался относительно body */
     overflow: hidden;
 }
 
-/* --- ОКНА АВТОРИЗАЦИИ (ВХОД И РЕГИСТРАЦИЯ) --- */
+/* --- ОКНА АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (ФИКС ПЕРЕКРЫТИЯ) --- */
 .auth-container {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
@@ -53,6 +52,22 @@ body {
     width: 400px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    
+    /* Идеальное центрирование */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+}
+
+/* КРИТИЧЕСКИЙ ФИКС: Если окно скрыто через display: none, оно НЕ должно перехватывать клики мыши */
+#authWindow[style*="display: none"],
+#setupProfileWindow[style*="display: none"],
+#mainApp[style*="display: none"] {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
 }
 
 .auth-container h2 {
@@ -75,12 +90,13 @@ body {
 
 /* --- СТРУКТУРА ПРИЛОЖЕНИЯ ПОСЛЕ ВХОДА (#mainApp) --- */
 #mainApp {
-    display: none; /* Переключается скриптом в flex при входе */
+    display: none; /* Переключается в flex скриптом */
     width: 100vw;
     height: 100vh;
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 1;
 }
 
 /* Сайдбар */
@@ -176,7 +192,7 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Сетки модулей (Вкладки Телефон, Компания и т.д.) */
+/* Сетки модулей */
 .workspace-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -197,8 +213,7 @@ body {
     padding-bottom: 5px;
 }
 
-/* --- ЭЛЕМЕНТЫ ФОРМ И КНОПКИ (ИЗ ТВОЕГО HTML) --- */
-/* Так как в оригинальных окнах авторизации div'ы без классов, настраиваем их напрямую */
+/* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ ФОРМ И КНОПКИ --- */
 #profileSetupForm div, .control-panel div {
     margin-bottom: 12px;
     text-align: left;
@@ -262,6 +277,8 @@ body {
     align-items: center;
     gap: 10px;
     justify-content: center;
+    position: relative;
+    z-index: 10; /* Кнопка точно сверху */
 }
 
 /* --- МОДАЛЬНЫЕ ОКНА --- */
@@ -290,11 +307,7 @@ body {
     margin-top: 15px;
 }
 
-/* Элементы Списков */
-.data-stream-container {
-    margin-top: 10px;
-}
-
+/* Списки */
 .list-item {
     display: flex;
     justify-content: space-between;
@@ -313,7 +326,7 @@ body {
     font-size: 14px;
 }
 
-/* Gmail */
+/* Почта */
 .email-item {
     padding: 10px;
     border-bottom: 1px solid var(--border-color);
@@ -321,18 +334,3 @@ body {
 }
 .email-item:hover { background: var(--sidebar-bg); }
 .email-item-unread { font-weight: bold; background: rgba(26,115,232,0.05); }
-
-
-/* Фикс перекрытия кликов скрытыми окнами */
-#setupProfileWindow[style*="display: none"],
-#mainApp[style*="display: none"],
-.modal-overlay[style*="display: none"] {
-    pointer-events: none !important;
-    visibility: hidden !important;
-}
-
-#btn-google-login {
-    position: relative;
-    z-index: 20 !important; /* Поднимаем кнопку выше всех фоновых слоев */
-    cursor: pointer !important;
-}
