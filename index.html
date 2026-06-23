@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Dashboard v0.1.6.2</title>
+    <title>Interactive Dashboard v0.1.6.1</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -38,7 +37,8 @@
         </form>
     </div>
 
-    <div id="mainApp" class="main-app" style="display: none;">
+
+    <div id="mainApp" class="main-app">
         <aside class="sidebar">
             <div class="sidebar-top">
                 <button class="nav-btn" onclick="switchPage('page-phone', this)" title="Phone">
@@ -73,7 +73,7 @@
             </div>
             
             <div class="sidebar-bottom">
-                <div id="sidebarAvatar" class="user-avatar-preview sidebar-avatar-interactive" onclick="switchPage('page-settings', document.getElementById('settingsNavBtn'))"></div>
+                <div id="sidebarAvatar" class="user-avatar-preview" style="width: 42px; height: 42px; font-size: 18px; cursor: pointer; margin-bottom: 5px;" onclick="switchPage('page-settings', document.getElementById('settingsNavBtn'))">👤</div>
 
                 <button id="settingsNavBtn" class="nav-btn" onclick="switchPage('page-settings', this)" title="Settings">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,6 +85,7 @@
         </aside>
 
         <main class="content-area">
+            
             <div id="page-phone" class="page">
                 <h2 data-i18n="phoneTitle">Phone Interface</h2>
                 <div class="two-column-layout">
@@ -206,19 +207,172 @@
                     <div class="settings-section"><button class="btn btn-danger" onclick="logout()" style="width: auto;" data-i18n="logOutBtn">Log Out</button></div>
                 </div>
             </div>
+
         </main>
     </div>
 
-    <div id="gmailComposeModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="newMsgTitle">Новое сообщение</h3><form id="gmailComposeForm" style="margin-top: 15px;"><div class="form-group"><label data-i18n="mailToLabel">Кому *</label><input type="email" id="gmailTo" placeholder="example@gmail.com" required></div><div class="form-group"><label data-i18n="mailSubjectLabel">Тема</label><input type="text" id="gmailSubject"></div><div class="form-group"><label data-i18n="mailBodyLabel">Текст сообщения *</label><textarea id="gmailBody" rows="6" required></textarea></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('gmailComposeModal')" data-i18n="cancelBtn">Отмена</button><button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendBtn">Отправить</button></div></form></div></div>
-    <div id="gmailViewModal" class="modal-overlay"><div class="modal-content" style="max-width: 550px;"><h3 id="gmailViewSubject" style="color: var(--accent-color); margin-bottom: 5px;">Тема письма</h3><div style="font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;"><strong data-i18n="mailFromLabel">От:</strong> <span id="gmailViewFrom"></span></div><div id="gmailViewBody" style="white-space: pre-wrap; background: var(--input-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; font-size: 14px; max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div><button id="gmailReplyBtn" class="btn btn-secondary" onclick="showGmailReplyForm()" style="width: auto; display: inline-block;" data-i18n="replyBtn">↩️ Ответить</button><form id="gmailReplyForm" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;"><h4 style="margin-bottom: 10px;" data-i18n="quickReplyTitle">Быстрый ответ</h4><div class="form-group"><textarea id="gmailReplyBody" rows="4" required></textarea></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('gmailViewModal')" data-i18n="closeBtn">Закрыть</button><button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendReplyBtn">Отправить ответ</button></div></form></div></div>
-    <div id="contactModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="createContactModalTitle">Create New Contact</h3><form id="contactForm" style="margin-top: 15px;"><div class="form-group"><label data-i18n="firstNameLabel">First Name *</label><input type="text" id="conFirstname" required></div><div class="form-group"><label data-i18n="lastNameLabel">Last Name *</label><input type="text" id="conLastname" required></div><div class="form-group"><label data-i18n="ageLabel">Age</label><input type="number" id="conAge"></div><div class="form-group"><label data-i18n="emailLabel">Email</label><input type="email" id="conEmail"></div><div class="form-group"><label data-i18n="phoneNumberLabel">Phone Number *</label><div class="phone-input-container"><select id="conCode"><option value="+2">+2 Russia</option><option value="+1">+1 USA</option></select><input type="text" id="conNumber" placeholder="1234567" maxlength="7" pattern="\d{7}" required></div></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('contactModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="saveContactBtn">Save Contact</button></div></form></div></div>
-    <div id="numberRegModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="registerVirtualNumberTitle">Register Virtual Number</h3><div class="form-group"><label data-i18n="selectRegionLabel">Select Region</label><select id="regNumberRegion" onchange="generateDailyNumbersPool()"><option value="+1">+1 USA</option><option value="+2">+2 Russia</option></select></div><div class="form-group"><label data-i18n="chooseNumberLabel">Choose a Number</label><select id="regNumberPoolSelect"></select></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('numberRegModal')" data-i18n="cancelBtn">Cancel</button><button type="button" class="btn" onclick="saveRegisteredNumber()" data-i18n="registerBtn">Register</button></div></div></div>
-    <div id="companyChoiceModal" class="modal-overlay"><div class="modal-content" style="text-align: center;"><h3 data-i18n="companyHubRegistryTitle">Company Hub Registry</h3><div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;"><button class="btn" onclick="closeModal('companyChoiceModal'); openModal('companyCreateModal')" data-i18n="createCompanyBtn">Create Company</button><button class="btn btn-secondary" onclick="closeModal('companyChoiceModal'); openModal('companyJoinModal')" data-i18n="joinCompanyBtn">Join Existing Company</button><button class="btn btn-danger" style="background:gray;" onclick="closeModal('companyChoiceModal')" data-i18n="cancelBtn">Cancel</button></div></div></div>
-    <div id="companyCreateModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="establishCompanyTitle">Establish New Company</h3><form id="companyCreateForm" style="margin-top: 15px;"><div class="form-group"><label data-i18n="companyNameLabel">Company Name *</label><input type="text" id="creationCompName" required></div><div class="form-group"><label data-i18n="companyAddressLabel">Company Address</label><input type="text" id="creationCompAddress"></div><div class="form-group"><label data-i18n="companyBioLabel">Company Bio *</label><textarea id="creationCompBio" rows="3" required></textarea></div><div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="creationCompLogo"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyCreateModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="createLaunchBtn">Create & Launch</button></div></form></div></div>
-    <div id="companyJoinModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="joinCorporateTitle">Join Corporate Network</h3><form id="companyJoinForm" style="margin-top: 15px;"><div class="form-group"><label data-i18n="enterTokenLabel">Enter Corporate Token</label><input type="text" id="joinCompCode" placeholder="COMP-XXXXXXXXX" required></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyJoinModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="authenticateBtn">Authenticate</button></div></form></div></div>
-    <div id="companySettingsModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="corporateControlTitle">Corporate Control Center</h3><div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;"><h4>Modify Profile</h4><div class="form-group" style="margin-top:10px;"><label data-i18n="companyNameLabel">Name</label><input type="text" id="setCompName"></div><div class="form-group"><label data-i18n="companyAddressLabel">Address</label><input type="text" id="setCompAddress"></div><div class="form-group"><label data-i18n="companyBioLabel">Bio</label><textarea id="setCompBio" rows="2"></textarea></div><div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="setCompLogo"></div><button class="btn" onclick="saveCompanyProfileChanges()">Apply Profile Updates</button></div><div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;"><h4>Access Tokens</h4><button class="btn btn-secondary" style="margin-top:5px;" onclick="generateCompanyInviteToken()">Generate Invitation Code</button><div id="inviteCodeDisplay" class="code-display" style="display:none; margin-top:10px;"></div></div><div style="margin-top:15px;"><h4>Role Architecture Config</h4><div class="form-group" style="margin-top:10px;"><label>Role Title</label><input type="text" id="newRoleTitle" placeholder="e.g. Lead Designer"></div><div style="font-size:13px; display:flex; flex-direction:column; gap:5px; margin-bottom:10px;"><label><input type="checkbox" id="permEditProfile"> Allow Profile Modification</label><label><input type="checkbox" id="permEditRoles"> Allow Role Modifications</label><label><input type="checkbox" id="permAddWidgets"> Allow Extension/Widget Deployment</label></div><button class="btn btn-secondary" onclick="createCustomRole()">Deploy Custom Role</button></div><div class="modal-actions"><button class="btn btn-danger" onclick="closeModal('companySettingsModal')">Dismiss</button></div></div></div>
-    <div id="widgetsModal" class="modal-overlay"><div class="modal-content" style="text-align: center;"><h3 data-i18n="widgetEcosystemTitle">Widget Ecosystem Extension</h3><p style="margin: 20px 0; font-size:16px; color: #dc3545; font-weight: bold;">[ UNDER DEVELOPMENT ]</p><button class="btn btn-full" onclick="closeModal('widgetsModal')">Close</button></div></div>
-    <div id="documentModal" class="modal-overlay"><div class="modal-content"><h3 data-i18n="createNewDocTitle">Create New Document</h3><form id="documentForm" style="margin-top: 15px;"><div class="form-group"><label data-i18n="docTitleLabel">Document Title *</label><input type="text" id="docTitle" placeholder="e.g. Report Summary" required></div><div class="form-group"><label data-i18n="docFontWeightLabel">Font Weight</label><select id="docFontWeight"><option value="normal">Normal</option><option value="bold">Bold</option></select></div><div class="form-group"><label data-i18n="docContentLabel">Content *</label><textarea id="docContent" rows="6" placeholder="..." required></textarea></div><div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="saveDocumentBtn">Save Document</button></div></form></div></div>
+    <div id="gmailComposeModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="newMsgTitle">Новое сообщение</h3>
+            <form id="gmailComposeForm" style="margin-top: 15px;">
+                <div class="form-group"><label data-i18n="mailToLabel">Кому *</label><input type="email" id="gmailTo" placeholder="example@gmail.com" required></div>
+                <div class="form-group"><label data-i18n="mailSubjectLabel">Тема</label><input type="text" id="gmailSubject"></div>
+                <div class="form-group"><label data-i18n="mailBodyLabel">Текст сообщения *</label><textarea id="gmailBody" rows="6" required></textarea></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('gmailComposeModal')" data-i18n="cancelBtn">Отмена</button>
+                    <button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendBtn">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="gmailViewModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 550px;">
+            <h3 id="gmailViewSubject" style="color: var(--accent-color); margin-bottom: 5px;">Тема письма</h3>
+            <div style="font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                <strong data-i18n="mailFromLabel">От:</strong> <span id="gmailViewFrom"></span>
+            </div>
+            <div id="gmailViewBody" style="white-space: pre-wrap; background: var(--input-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; font-size: 14px; max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+            
+            <button id="gmailReplyBtn" class="btn btn-secondary" onclick="showGmailReplyForm()" style="width: auto; display: inline-block;" data-i18n="replyBtn">↩️ Ответить</button>
+            
+            <form id="gmailReplyForm" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4 style="margin-bottom: 10px;" data-i18n="quickReplyTitle">Быстрый ответ</h4>
+                <div class="form-group"><textarea id="gmailReplyBody" rows="4" required></textarea></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('gmailViewModal')" data-i18n="closeBtn">Закрыть</button>
+                    <button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendReplyBtn">Отправить ответ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="createContactModalTitle">Create New Contact</h3>
+            <form id="contactForm" style="margin-top: 15px;">
+                <div class="form-group"><label data-i18n="firstNameLabel">First Name *</label><input type="text" id="conFirstname" required></div>
+                <div class="form-group"><label data-i18n="lastNameLabel">Last Name *</label><input type="text" id="conLastname" required></div>
+                <div class="form-group"><label data-i18n="ageLabel">Age</label><input type="number" id="conAge"></div>
+                <div class="form-group"><label data-i18n="emailLabel">Email</label><input type="email" id="conEmail"></div>
+                <div class="form-group">
+                    <label data-i18n="phoneNumberLabel">Phone Number *</label>
+                    <div class="phone-input-container">
+                        <select id="conCode"><option value="+2">+2 Russia</option><option value="+1">+1 USA</option></select>
+                        <input type="text" id="conNumber" placeholder="1234567" maxlength="7" pattern="\d{7}" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('contactModal')" data-i18n="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn" data-i18n="saveContactBtn">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="numberRegModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="registerVirtualNumberTitle">Register Virtual Number</h3>
+            <div class="form-group"><label data-i18n="selectRegionLabel">Select Region</label><select id="regNumberRegion" onchange="generateDailyNumbersPool()"><option value="+1">+1 USA</option><option value="+2">+2 Russia</option></select></div>
+            <div class="form-group"><label data-i18n="chooseNumberLabel">Choose a Number</label><select id="regNumberPoolSelect"></select></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('numberRegModal')" data-i18n="cancelBtn">Cancel</button>
+                <button type="button" class="btn" onclick="saveRegisteredNumber()" data-i18n="registerBtn">Register</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="companyChoiceModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h3 data-i18n="companyHubRegistryTitle">Company Hub Registry</h3>
+            <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn" onclick="closeModal('companyChoiceModal'); openModal('companyCreateModal')" data-i18n="createCompanyBtn">Create Company</button>
+                <button class="btn btn-secondary" onclick="closeModal('companyChoiceModal'); openModal('companyJoinModal')" data-i18n="joinCompanyBtn">Join Existing Company</button>
+                <button class="btn btn-danger" style="background:gray;" onclick="closeModal('companyChoiceModal')" data-i18n="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="companyCreateModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="establishCompanyTitle">Establish New Company</h3>
+            <form id="companyCreateForm" style="margin-top: 15px;">
+                <div class="form-group"><label data-i18n="companyNameLabel">Company Name *</label><input type="text" id="creationCompName" required></div>
+                <div class="form-group"><label data-i18n="companyAddressLabel">Company Address</label><input type="text" id="creationCompAddress"></div>
+                <div class="form-group"><label data-i18n="companyBioLabel">Company Bio *</label><textarea id="creationCompBio" rows="3" required></textarea></div>
+                <div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="creationCompLogo"></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyCreateModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="createLaunchBtn">Create & Launch</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="companyJoinModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="joinCorporateTitle">Join Corporate Network</h3>
+            <form id="companyJoinForm" style="margin-top: 15px;">
+                <div class="form-group"><label data-i18n="enterTokenLabel">Enter Corporate Token</label><input type="text" id="joinCompCode" placeholder="COMP-XXXXXXXXX" required></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyJoinModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="authenticateBtn">Authenticate</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="companySettingsModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="corporateControlTitle">Corporate Control Center</h3>
+            <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
+                <h4 data-i18n="modifyProfileHeader">Modify Profile</h4>
+                <div class="form-group" style="margin-top:10px;"><label data-i18n="companyNameLabel">Name</label><input type="text" id="setCompName"></div>
+                <div class="form-group"><label data-i18n="companyAddressLabel">Address</label><input type="text" id="setCompAddress"></div>
+                <div class="form-group"><label data-i18n="companyBioLabel">Bio</label><textarea id="setCompBio" rows="2"></textarea></div>
+                <div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="setCompLogo"></div>
+                <button class="btn" onclick="saveCompanyProfileChanges()" data-i18n="applyUpdatesBtn">Apply Profile Updates</button>
+            </div>
+            <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
+                <h4 data-i18n="accessTokensHeader">Access Tokens</h4>
+                <button class="btn btn-secondary" style="margin-top:5px;" onclick="generateCompanyInviteToken()" data-i18n="generateInviteBtn">Generate Invitation Code</button>
+                <div id="inviteCodeDisplay" class="code-display" style="display:none; margin-top:10px;"></div>
+            </div>
+            <div style="margin-top:15px;">
+                <h4 data-i18n="roleArchitectureHeader">Role Architecture Config</h4>
+                <div class="form-group" style="margin-top:10px;"><label data-i18n="roleTitleLabel">Role Title</label><input type="text" id="newRoleTitle" placeholder="e.g. Lead Designer"></div>
+                <div style="font-size:13px; display:flex; flex-direction:column; gap:5px; margin-bottom:10px;">
+                    <label><input type="checkbox" id="permEditProfile"> <span data-i18n="permEditProfileLabel">Allow Profile Modification</span></label>
+                    <label><input type="checkbox" id="permEditRoles"> <span data-i18n="permEditRolesLabel">Allow Role Modifications</span></label>
+                    <label><input type="checkbox" id="permAddWidgets"> <span data-i18n="permAddWidgetsLabel">Allow Extension/Widget Deployment</span></label>
+                </div>
+                <button class="btn btn-secondary" onclick="createCustomRole()" data-i18n="deployRoleBtn">Deploy Custom Role</button>
+            </div>
+            <div class="modal-actions"><button class="btn btn-danger" onclick="closeModal('companySettingsModal')" data-i18n="dismissBtn">Dismiss</button></div>
+        </div>
+    </div>
+
+    <div id="widgetsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h3 data-i18n="widgetEcosystemTitle">Widget Ecosystem Extension</h3>
+            <p style="margin: 20px 0; font-size:16px; color: #dc3545; font-weight: bold;" data-i18n="underDevelopment">[ UNDER DEVELOPMENT ]</p>
+            <button class="btn btn-full" onclick="closeModal('widgetsModal')" data-i18n="closeBtn">Close</button>
+        </div>
+    </div>
+
+    <div id="documentModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 data-i18n="createNewDocTitle">Create New Document</h3>
+            <form id="documentForm" style="margin-top: 15px;">
+                <div class="form-group"><label data-i18n="docTitleLabel">Document Title *</label><input type="text" id="docTitle" placeholder="e.g. Report Summary" required></div>
+                <div class="form-group">
+                    <label data-i18n="docFontLabel">Font Styling / Weight</label>
+                    <select id="docFontWeight">
+                        <option value="normal">Normal Style</option>
+                        <option value="bold">Bold Text</option>
+                        <option value="italic">Italic Text</option>
+                        <option value="underline">Underline Text</option>
+                    </select>
+                </div>
+                <div class="form-group"><label data-i18n="docContentLabel">Document Content Body *</label><textarea id="docContent" rows="6" required></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="saveDocBtn">Save Document</button></div>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
