@@ -3,411 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Dashboard v0.1.6.1</title>
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --sidebar-bg: #f0f2f5;
-            --input-bg: #ffffff;
-            --border-color: #cccccc;
-            --btn-bg: #007bff;
-            --btn-text: #ffffff;
-            --icon-stroke: #333333;
-            --panel-bg: #fafafa;
-            --accent-color: #1a73e8;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #18191a;
-            --text-color: #e4e6eb;
-            --sidebar-bg: #242526;
-            --input-bg: #3a3b3c;
-            --border-color: #3e4042;
-            --btn-bg: #2d88ff;
-            --btn-text: #ffffff;
-            --icon-stroke: #e4e6eb;
-            --panel-bg: #1c1d1e;
-            --accent-color: #4285f4;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        body.rtl {
-            direction: rtl;
-        }
-
-        /* Auth Containers */
-        .auth-container {
-            background: var(--sidebar-bg);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .auth-container h2 {
-            margin-bottom: 15px;
-        }
-
-        .auth-container p {
-            font-size: 14px;
-            color: gray;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        body.rtl .form-group {
-            text-align: right;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--input-bg);
-            color: var(--text-color);
-        }
-
-        .phone-input-container {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 12px;
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background 0.2s, opacity 0.2s;
-        }
-
-        .btn-full {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .error-msg {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        /* Sidebar & Main Interface */
-        .main-app {
-            display: none;
-            width: 100%;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 80px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            flex-shrink: 0;
-        }
-        body.rtl .sidebar {
-            border-right: none;
-            border-left: 1px solid var(--border-color);
-        }
-
-        .sidebar-top, .sidebar-bottom {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            align-items: center;
-        }
-
-        .nav-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        .nav-btn svg {
-            width: 26px;
-            height: 26px;
-            stroke: var(--icon-stroke);
-            transition: stroke 0.2s;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--border-color);
-        }
-
-        .content-area {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        .page {
-            display: none;
-            height: 100%;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* Layout Panels */
-        .two-column-layout {
-            display: flex;
-            gap: 20px;
-            height: calc(100% - 40px);
-            margin-top: 20px;
-        }
-
-        .panel-left, .panel-full {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .panel-left { width: 45%; }
-        .panel-right { width: 55%; background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
-        .panel-full { width: 100%; height: calc(100% - 40px); margin-top: 20px; }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .scrollable-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .empty-placeholder {
-            text-align: center;
-            color: gray;
-            margin: auto;
-            font-style: italic;
-        }
-
-        .item-card {
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .item-card h4 { margin-bottom: 6px; }
-        .item-card p { font-size: 14px; }
-
-        .dialer-box {
-            max-width: 320px;
-            margin: auto;
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Profile Avatar / Logo Display */
-        .avatar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .user-avatar-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--border-color);
-            object-fit: cover;
-            border: 2px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-
-        /* Gmail Container */
-        .mail-container {
-            background: var(--panel-bg);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-top: 20px;
-        }
-
-        #btn-google-login {
-            background-color: var(--accent-color);
-            color: #ffffff;
-            padding: 14px 32px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #btn-google-login:hover {
-            opacity: 0.95;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-        }
-
-        /* Company CSS */
-        .company-header-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: var(--input-bg);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 15px;
-        }
-
-        .company-logo-preview {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            background: var(--sidebar-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            border: 1px solid var(--border-color);
-            object-fit: cover;
-        }
-
-        /* Modals */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--bg-color);
-            color: var(--text-color);
-            padding: 25px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 450px;
-            border: 1px solid var(--border-color);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .settings-layout { max-width: 600px; }
-        .settings-section { margin-bottom: 30px; }
-        .settings-section h3 { margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-        .theme-switch-box { display: flex; gap: 15px; }
-        .theme-switch-box button, .theme-switch-box select { width: auto; padding: 10px 20px; }
-        .btn-secondary { background: var(--border-color); color: var(--text-color); }
-        .btn-danger { background: #dc3545; color: white; }
-    </style>
+    <title>Interactive Dashboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="authWindow" class="auth-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 48px; margin-bottom: 15px;">
-        <h2 data-i18n="appTitle">Interactive Dashboard</h2>
-        <p data-i18n="authDesc">Для безопасного входа и автоматической синхронизации с вашей корпоративной почтой авторизуйтесь через Google-аккаунт.</p>
-        <button id="btn-google-login" data-i18n="googleLoginBtn">Войти через Google</button>
+    <div id="registerWindow" class="auth-container">
+        <h2>Create Account</h2>
+        <form id="regForm">
+            <div class="form-group"><label>First Name</label><input type="text" id="regFirstname" required></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="regLastname" required></div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="regAge" required>
+                <div id="ageError" class="error-msg">Registration is only allowed for ages 7 and older!</div>
+            </div>
+            <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" required></div>
+            <button type="submit" class="btn btn-full">Sign Up</button>
+        </form>
+        <div class="switch-auth" onclick="showAuthPage('login')">I already have an access code</div>
+        <div id="codeResult" class="code-display" style="display: none;"></div>
     </div>
 
-    <div id="setupProfileWindow" class="auth-container" style="display: none;">
-        <h2 data-i18n="setupTitle">Завершение регистрации</h2>
-        <p data-i18n="setupDesc">Пожалуйста, укажите ваши данные для создания рабочего профиля.</p>
-        <form id="profileSetupForm">
-            <div class="avatar-container">
-                <div id="setupAvatarPreview" class="user-avatar-preview">👤</div>
-                <div class="form-group" style="margin-bottom:0; width:100%;">
-                    <label data-i18n="uploadLogoLabel">Логотип / Аватар профиля</label>
-                    <input type="file" id="setupAvatarInput" accept="image/*">
-                </div>
-            </div>
-            <div class="form-group"><label data-i18n="firstNameLabel">First Name</label><input type="text" id="setupFirstname" required></div>
-            <div class="form-group"><label data-i18n="lastNameLabel">Last Name</label><input type="text" id="setupLastname" required></div>
+    <div id="loginWindow" class="auth-container" style="display: none;">
+        <h2>Log In</h2>
+        <form id="loginForm">
             <div class="form-group">
-                <label data-i18n="ageLabel">Age</label>
-                <input type="number" id="setupAge" required>
-                <div id="ageSetupError" class="error-msg" data-i18n="ageErrorMsg">Registration is only allowed for ages 7 and older!</div>
+                <label>Enter your special access code</label>
+                <input type="text" id="loginCode" required>
+                <div id="loginError" class="error-msg">Invalid access code!</div>
             </div>
-            <button type="submit" class="btn btn-full" data-i18n="createProfileBtn">Создать профиль</button>
+            <button type="submit" class="btn btn-full">Log In</button>
         </form>
+        <div class="switch-auth" onclick="showAuthPage('register')">Create a new account</div>
     </div>
 
 
@@ -446,9 +74,7 @@
             </div>
             
             <div class="sidebar-bottom">
-                <div id="sidebarAvatar" class="user-avatar-preview" style="width: 42px; height: 42px; font-size: 18px; cursor: pointer; margin-bottom: 5px;" onclick="switchPage('page-settings', document.getElementById('settingsNavBtn'))">👤</div>
-
-                <button id="settingsNavBtn" class="nav-btn" onclick="switchPage('page-settings', this)" title="Settings">
+                <button class="nav-btn" onclick="switchPage('page-settings', this)" title="Settings">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1 2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -460,61 +86,64 @@
         <main class="content-area">
             
             <div id="page-phone" class="page">
-                <h2 data-i18n="phoneTitle">Phone Interface</h2>
+                <h2>Phone Interface</h2>
                 <div class="two-column-layout">
                     <div class="panel-left">
-                        <div class="panel-header"><h3 data-i18n="contactsHeader">Contacts</h3><button class="btn" onclick="openModal('contactModal')" data-i18n="createContactBtn">Create Contact</button></div>
+                        <div class="panel-header"><h3>Contacts</h3><button class="btn" onclick="openModal('contactModal')">Create Contact</button></div>
                         <div id="contactsContainer" class="scrollable-list"></div>
                     </div>
                     <div class="panel-right">
                         <div class="panel-header">
-                            <h3 data-i18n="makeCallHeader">Make a Call</h3>
+                            <h3>Make a Call</h3>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <select id="myNumbersSelect" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color);"></select>
-                                <button class="btn" onclick="openNumberRegModal()" data-i18n="registerNumberBtn">Register Number</button>
+                                <button class="btn" onclick="openNumberRegModal()">Register Number</button>
                             </div>
                         </div>
                         <div class="dialer-box">
-                            <div class="form-group" style="margin-top: 40px;"><label data-i18n="destinationLabel">Enter destination number</label><input type="text" id="dialNumberInput" placeholder="+1 0000000" style="font-size: 20px; text-align: center; letter-spacing: 1px;"></div>
-                            <button class="btn btn-full" onclick="makeCall()" style="background: #28a745; font-size: 18px; padding: 15px;" data-i18n="callBtn">Call</button>
+                            <div class="form-group" style="margin-top: 40px;"><label>Enter destination number</label><input type="text" id="dialNumberInput" placeholder="+1 0000000" style="font-size: 20px; text-align: center; letter-spacing: 1px;"></div>
+                            <button class="btn btn-full" onclick="makeCall()" style="background: #28a745; font-size: 18px; padding: 15px;">Call</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="page-company" class="page">
-                <h2 data-i18n="companyTitle">Company Hub</h2>
+                <h2>Company Hub</h2>
                 <div id="companyStateUnregistered" style="text-align: center; margin-top: 80px;">
-                    <p style="font-size: 18px; color: gray; margin-bottom: 20px;" data-i18n="unregisteredCompany">Not registered in any company</p>
-                    <button class="btn" style="padding: 15px 30px; font-size: 16px;" onclick="openModal('companyChoiceModal')" data-i18n="choiceCompanyBtn">Register / Join Company</button>
+                    <p style="font-size: 18px; color: gray; margin-bottom: 20px;">Not registered in any company</p>
+                    <button class="btn" style="padding: 15px 30px; font-size: 16px;" onclick="openModal('companyChoiceModal')">Register / Join Company</button>
                 </div>
                 <div id="companyStateDashboard" class="two-column-layout" style="display: none;">
                     <div class="panel-left">
                         <div class="company-header-card">
-                            <div id="compDashboardLogo" class="company-logo-preview">🏢</div>
+                            <div id="compDashboardLogo" class="company-logo-container">
+                                <img id="compDashboardLogoImg" src="" class="company-logo-preview" alt="Company Logo" style="display: none;">
+                                <div id="compDashboardLogoPlaceholder" class="company-logo-placeholder">🏢</div>
+                            </div>
                             <div><h3 id="compDashboardName">Company Name</h3><p id="compDashboardAddress" style="font-size: 12px; color: gray;">Address</p></div>
                         </div>
                         <p id="compDashboardBio" style="font-size: 13px; margin-bottom: 15px; padding: 5px; font-style: italic;"></p>
-                        <div class="panel-header" style="margin-bottom: 10px;"><h4 data-i18n="membersDirectory">Members Directory</h4></div>
+                        <div class="panel-header" style="margin-bottom: 10px;"><h4>Members Directory</h4></div>
                         <div id="companyMembersContainer" class="scrollable-list"></div>
                     </div>
                     <div class="panel-right">
                         <div class="panel-header">
-                            <h3 data-i18n="workspaceActions">Workspace Actions</h3>
+                            <h3>Workspace Actions</h3>
                             <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-secondary" onclick="openModal('widgetsModal')" data-i18n="addWidgetsBtn">Add Widgets</button>
-                                <button id="compSettingsBtn" class="btn" onclick="openCompanySettingsModal()" data-i18n="companySettingsBtn">Company Settings</button>
+                                <button class="btn btn-secondary" onclick="openModal('widgetsModal')">Add Widgets</button>
+                                <button id="compSettingsBtn" class="btn" onclick="openCompanySettingsModal()">Company Settings</button>
                             </div>
                         </div>
-                        <div class="empty-placeholder" data-i18n="workspacePlaceholder">Select an action above to manage your corporate assets.</div>
+                        <div class="empty-placeholder">Select an action above to manage your corporate assets.</div>
                     </div>
                 </div>
             </div>
 
             <div id="page-document" class="page">
                 <div class="panel-header">
-                    <h2 data-i18n="documentsTitle">Documents Panel</h2>
-                    <button class="btn" onclick="openModal('documentModal')" data-i18n="createDocumentBtn">Create Document</button>
+                    <h2>Documents Panel</h2>
+                    <button class="btn" onclick="openModal('documentModal')">Create Document</button>
                 </div>
                 <div class="panel-full">
                     <div id="documentsContainer" class="scrollable-list"></div>
@@ -522,122 +151,70 @@
             </div>
 
             <div id="page-mail" class="page">
-                <h2 data-i18n="mailTitle">Gmail Portal</h2>
+                <h2>Gmail Portal</h2>
                 <div class="mail-container">
-                    <div id="emails-block">
+        
+                    <div id="auth-block" style="text-align: center; padding: 40px 0;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" style="width: 56px; margin-bottom: 20px;">
+                        <p style="margin-bottom: 20px; color: var(--text-color); font-size: 15px;">Для просмотра входящих писем необходимо войти в аккаунт Google</p>
+                        <button id="btn-login">Войти через Google</button>
+                    </div>
+
+                    <div id="emails-block" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                            <span id="user-email" style="font-weight: 500; color: var(--text-color);" data-i18n="syncMail">Синхронизация почты...</span>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn" onclick="openModal('gmailComposeModal')" style="background-color: var(--accent-color); padding: 6px 15px;" data-i18n="composeMailBtn">✏️ Написать</button>
-                            </div>
+                            <span id="user-email" style="font-weight: 500; color: var(--text-color);">Загрузка аккаунта...</span>
+                            <button id="btn-logout" style="background: transparent; border: 1px solid #ff4a4a; color: #ff4a4a; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Выйти</button>
                         </div>
                         <div id="emails-list"></div>
                     </div>
+
                 </div>
             </div>
 
             <div id="page-settings" class="page">
-                <h2 data-i18n="settingsTitle">Settings</h2>
+                <h2>Settings</h2>
                 <div class="settings-layout">
                     <div class="settings-section">
-                        <h3 data-i18n="appThemeTitle">App Theme</h3>
+                        <h3>App Theme</h3>
                         <div class="theme-switch-box">
-                            <button class="btn btn-secondary" onclick="setTheme('light')" data-i18n="themeLight">Light</button>
-                            <button class="btn btn-secondary" onclick="setTheme('dark')" data-i18n="themeDark">Dark</button>
+                            <button class="btn btn-secondary" onclick="setTheme('light')">Light</button>
+                            <button class="btn btn-secondary" onclick="setTheme('dark')">Dark</button>
                         </div>
                     </div>
-
                     <div class="settings-section">
-                        <h3 data-i18n="appLanguageTitle">Language / Язык</h3>
-                        <div class="theme-switch-box">
-                            <select id="langSelect" onchange="changeLanguage(this.value)" style="padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); min-width: 150px;">
-                                <option value="en">English</option>
-                                <option value="he">עברית (Hebrew)</option>
-                                <option value="ar">العربية (Arabic)</option>
-                                <option value="ru">Русский</option>
-                                <option value="es">Español</option>
-                                <option value="fr">Français</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 data-i18n="personalInfoTitle">Personal Information</h3>
+                        <h3>Personal Information</h3>
                         <form id="editProfileForm">
-                            <div class="avatar-container" style="flex-direction: row; text-align: left;">
-                                <div id="editAvatarPreview" class="user-avatar-preview">👤</div>
-                                <div>
-                                    <label style="font-weight: bold;" data-i18n="uploadLogoLabel">Логотип / Аватар профиля</label>
-                                    <input type="file" id="editAvatarInput" accept="image/*" style="margin-top:5px;">
-                                </div>
-                            </div>
-                            <div class="form-group"><label data-i18n="firstNameLabel">First Name</label><input type="text" id="editFirstname" required></div>
-                            <div class="form-group"><label data-i18n="lastNameLabel">Last Name</label><input type="text" id="editLastname" required></div>
-                            <div class="form-group"><label data-i18n="emailLabel">Email Address</label><input type="email" id="editEmail" readonly style="opacity: 0.6; cursor: not-allowed;"></div>
-                            <button type="submit" class="btn" style="width: auto; padding: 10px 20px;" data-i18n="saveChangesBtn">Save Changes</button>
+                            <div class="form-group"><label>First Name</label><input type="text" id="editFirstname" required></div>
+                            <div class="form-group"><label>Last Name</label><input type="text" id="editLastname" required></div>
+                            <div class="form-group"><label>Email Address</label><input type="email" id="editEmail" required></div>
+                            <button type="submit" class="btn" style="width: auto; padding: 10px 20px;">Save Changes</button>
                         </form>
                     </div>
-                    <div class="settings-section"><button class="btn btn-danger" onclick="logout()" style="width: auto;" data-i18n="logOutBtn">Log Out</button></div>
+                    <div class="settings-section"><button class="btn btn-danger" onclick="logout()" style="width: auto;">Log Out</button></div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <div id="gmailComposeModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 data-i18n="newMsgTitle">Новое сообщение</h3>
-            <form id="gmailComposeForm" style="margin-top: 15px;">
-                <div class="form-group"><label data-i18n="mailToLabel">Кому *</label><input type="email" id="gmailTo" placeholder="example@gmail.com" required></div>
-                <div class="form-group"><label data-i18n="mailSubjectLabel">Тема</label><input type="text" id="gmailSubject"></div>
-                <div class="form-group"><label data-i18n="mailBodyLabel">Текст сообщения *</label><textarea id="gmailBody" rows="6" required></textarea></div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('gmailComposeModal')" data-i18n="cancelBtn">Отмена</button>
-                    <button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendBtn">Отправить</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="gmailViewModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 550px;">
-            <h3 id="gmailViewSubject" style="color: var(--accent-color); margin-bottom: 5px;">Тема письма</h3>
-            <div style="font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <strong data-i18n="mailFromLabel">От:</strong> <span id="gmailViewFrom"></span>
-            </div>
-            <div id="gmailViewBody" style="white-space: pre-wrap; background: var(--input-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; font-size: 14px; max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
-            
-            <button id="gmailReplyBtn" class="btn btn-secondary" onclick="showGmailReplyForm()" style="width: auto; display: inline-block;" data-i18n="replyBtn">↩️ Ответить</button>
-            
-            <form id="gmailReplyForm" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <h4 style="margin-bottom: 10px;" data-i18n="quickReplyTitle">Быстрый ответ</h4>
-                <div class="form-group"><textarea id="gmailReplyBody" rows="4" required></textarea></div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('gmailViewModal')" data-i18n="closeBtn">Закрыть</button>
-                    <button type="submit" class="btn" style="background-color: var(--accent-color);" data-i18n="sendReplyBtn">Отправить ответ</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div id="contactModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="createContactModalTitle">Create New Contact</h3>
+            <h3>Create New Contact</h3>
             <form id="contactForm" style="margin-top: 15px;">
-                <div class="form-group"><label data-i18n="firstNameLabel">First Name *</label><input type="text" id="conFirstname" required></div>
-                <div class="form-group"><label data-i18n="lastNameLabel">Last Name *</label><input type="text" id="conLastname" required></div>
-                <div class="form-group"><label data-i18n="ageLabel">Age</label><input type="number" id="conAge"></div>
-                <div class="form-group"><label data-i18n="emailLabel">Email</label><input type="email" id="conEmail"></div>
+                <div class="form-group"><label>First Name *</label><input type="text" id="conFirstname" required></div>
+                <div class="form-group"><label>Last Name *</label><input type="text" id="conLastname" required></div>
+                <div class="form-group"><label>Age</label><input type="number" id="conAge"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="conEmail"></div>
                 <div class="form-group">
-                    <label data-i18n="phoneNumberLabel">Phone Number *</label>
+                    <label>Phone Number *</label>
                     <div class="phone-input-container">
                         <select id="conCode"><option value="+2">+2 Russia</option><option value="+1">+1 USA</option></select>
                         <input type="text" id="conNumber" placeholder="1234567" maxlength="7" pattern="\d{7}" required>
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('contactModal')" data-i18n="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn" data-i18n="saveContactBtn">Save Contact</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('contactModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Contact</button>
                 </div>
             </form>
         </div>
@@ -645,95 +222,95 @@
 
     <div id="numberRegModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="registerVirtualNumberTitle">Register Virtual Number</h3>
-            <div class="form-group"><label data-i18n="selectRegionLabel">Select Region</label><select id="regNumberRegion" onchange="generateDailyNumbersPool()"><option value="+1">+1 USA</option><option value="+2">+2 Russia</option></select></div>
-            <div class="form-group"><label data-i18n="chooseNumberLabel">Choose a Number</label><select id="regNumberPoolSelect"></select></div>
+            <h3>Register Virtual Number</h3>
+            <div class="form-group"><label>Select Region</label><select id="regNumberRegion" onchange="generateDailyNumbersPool()"><option value="+1">+1 USA</option><option value="+2">+2 Russia</option></select></div>
+            <div class="form-group"><label>Choose a Number</label><select id="regNumberPoolSelect"></select></div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('numberRegModal')" data-i18n="cancelBtn">Cancel</button>
-                <button type="button" class="btn" onclick="saveRegisteredNumber()" data-i18n="registerBtn">Register</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('numberRegModal')">Cancel</button>
+                <button type="button" class="btn" onclick="saveRegisteredNumber()">Register</button>
             </div>
         </div>
     </div>
 
     <div id="companyChoiceModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
-            <h3 data-i18n="companyHubRegistryTitle">Company Hub Registry</h3>
+            <h3>Company Hub Registry</h3>
             <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
-                <button class="btn" onclick="closeModal('companyChoiceModal'); openModal('companyCreateModal')" data-i18n="createCompanyBtn">Create Company</button>
-                <button class="btn btn-secondary" onclick="closeModal('companyChoiceModal'); openModal('companyJoinModal')" data-i18n="joinCompanyBtn">Join Existing Company</button>
-                <button class="btn btn-danger" style="background:gray;" onclick="closeModal('companyChoiceModal')" data-i18n="cancelBtn">Cancel</button>
+                <button class="btn" onclick="closeModal('companyChoiceModal'); openModal('companyCreateModal')">Create Company</button>
+                <button class="btn btn-secondary" onclick="closeModal('companyChoiceModal'); openModal('companyJoinModal')">Join Existing Company</button>
+                <button class="btn btn-danger" style="background:gray;" onclick="closeModal('companyChoiceModal')">Cancel</button>
             </div>
         </div>
     </div>
 
     <div id="companyCreateModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="establishCompanyTitle">Establish New Company</h3>
+            <h3>Establish New Company</h3>
             <form id="companyCreateForm" style="margin-top: 15px;">
-                <div class="form-group"><label data-i18n="companyNameLabel">Company Name *</label><input type="text" id="creationCompName" required></div>
-                <div class="form-group"><label data-i18n="companyAddressLabel">Company Address</label><input type="text" id="creationCompAddress"></div>
-                <div class="form-group"><label data-i18n="companyBioLabel">Company Bio *</label><textarea id="creationCompBio" rows="3" required></textarea></div>
-                <div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="creationCompLogo"></div>
-                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyCreateModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="createLaunchBtn">Create & Launch</button></div>
+                <div class="form-group"><label>Company Name *</label><input type="text" id="creationCompName" required></div>
+                <div class="form-group"><label>Company Address</label><input type="text" id="creationCompAddress"></div>
+                <div class="form-group"><label>Company Bio *</label><textarea id="creationCompBio" rows="3" required></textarea></div>
+                <div class="form-group"><label>Logo URL</label><input type="url" id="creationCompLogo"></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyCreateModal')">Cancel</button><button type="submit" class="btn">Create & Launch</button></div>
             </form>
         </div>
     </div>
 
     <div id="companyJoinModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="joinCorporateTitle">Join Corporate Network</h3>
+            <h3>Join Corporate Network</h3>
             <form id="companyJoinForm" style="margin-top: 15px;">
-                <div class="form-group"><label data-i18n="enterTokenLabel">Enter Corporate Token</label><input type="text" id="joinCompCode" placeholder="COMP-XXXXXXXXX" required></div>
-                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyJoinModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="authenticateBtn">Authenticate</button></div>
+                <div class="form-group"><label>Enter Corporate Token</label><input type="text" id="joinCompCode" placeholder="COMP-XXXXXXXXX" required></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('companyJoinModal')">Cancel</button><button type="submit" class="btn">Authenticate</button></div>
             </form>
         </div>
     </div>
 
     <div id="companySettingsModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="corporateControlTitle">Corporate Control Center</h3>
+            <h3>Corporate Control Center</h3>
             <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
-                <h4 data-i18n="modifyProfileHeader">Modify Profile</h4>
-                <div class="form-group" style="margin-top:10px;"><label data-i18n="companyNameLabel">Name</label><input type="text" id="setCompName"></div>
-                <div class="form-group"><label data-i18n="companyAddressLabel">Address</label><input type="text" id="setCompAddress"></div>
-                <div class="form-group"><label data-i18n="companyBioLabel">Bio</label><textarea id="setCompBio" rows="2"></textarea></div>
-                <div class="form-group"><label data-i18n="logoUrlLabel">Logo URL</label><input type="url" id="setCompLogo"></div>
-                <button class="btn" onclick="saveCompanyProfileChanges()" data-i18n="applyUpdatesBtn">Apply Profile Updates</button>
+                <h4>Modify Profile</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Name</label><input type="text" id="setCompName"></div>
+                <div class="form-group"><label>Address</label><input type="text" id="setCompAddress"></div>
+                <div class="form-group"><label>Bio</label><textarea id="setCompBio" rows="2"></textarea></div>
+                <div class="form-group"><label>Logo URL</label><input type="url" id="setCompLogo"></div>
+                <button class="btn" onclick="saveCompanyProfileChanges()">Apply Profile Updates</button>
             </div>
             <div style="margin-top:15px; border-bottom: 1px solid var(--border-color); padding-bottom:15px;">
-                <h4 data-i18n="accessTokensHeader">Access Tokens</h4>
-                <button class="btn btn-secondary" style="margin-top:5px;" onclick="generateCompanyInviteToken()" data-i18n="generateInviteBtn">Generate Invitation Code</button>
+                <h4>Access Tokens</h4>
+                <button class="btn btn-secondary" style="margin-top:5px;" onclick="generateCompanyInviteToken()">Generate Invitation Code</button>
                 <div id="inviteCodeDisplay" class="code-display" style="display:none; margin-top:10px;"></div>
             </div>
             <div style="margin-top:15px;">
-                <h4 data-i18n="roleArchitectureHeader">Role Architecture Config</h4>
-                <div class="form-group" style="margin-top:10px;"><label data-i18n="roleTitleLabel">Role Title</label><input type="text" id="newRoleTitle" placeholder="e.g. Lead Designer"></div>
+                <h4>Role Architecture Config</h4>
+                <div class="form-group" style="margin-top:10px;"><label>Role Title</label><input type="text" id="newRoleTitle" placeholder="e.g. Lead Designer"></div>
                 <div style="font-size:13px; display:flex; flex-direction:column; gap:5px; margin-bottom:10px;">
-                    <label><input type="checkbox" id="permEditProfile"> <span data-i18n="permEditProfileLabel">Allow Profile Modification</span></label>
-                    <label><input type="checkbox" id="permEditRoles"> <span data-i18n="permEditRolesLabel">Allow Role Modifications</span></label>
-                    <label><input type="checkbox" id="permAddWidgets"> <span data-i18n="permAddWidgetsLabel">Allow Extension/Widget Deployment</span></label>
+                    <label><input type="checkbox" id="permEditProfile"> Allow Profile Modification</label>
+                    <label><input type="checkbox" id="permEditRoles"> Allow Role Modifications</label>
+                    <label><input type="checkbox" id="permAddWidgets"> Allow Extension/Widget Deployment</label>
                 </div>
-                <button class="btn btn-secondary" onclick="createCustomRole()" data-i18n="deployRoleBtn">Deploy Custom Role</button>
+                <button class="btn btn-secondary" onclick="createCustomRole()">Deploy Custom Role</button>
             </div>
-            <div class="modal-actions"><button class="btn btn-danger" onclick="closeModal('companySettingsModal')" data-i18n="dismissBtn">Dismiss</button></div>
+            <div class="modal-actions"><button class="btn btn-danger" onclick="closeModal('companySettingsModal')">Dismiss</button></div>
         </div>
     </div>
 
     <div id="widgetsModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
-            <h3 data-i18n="widgetEcosystemTitle">Widget Ecosystem Extension</h3>
-            <p style="margin: 20px 0; font-size:16px; color: #dc3545; font-weight: bold;" data-i18n="underDevelopment">[ UNDER DEVELOPMENT ]</p>
-            <button class="btn btn-full" onclick="closeModal('widgetsModal')" data-i18n="closeBtn">Close</button>
+            <h3>Widget Ecosystem Extension</h3>
+            <p style="margin: 20px 0; font-size:16px; color: #dc3545; font-weight: bold;">[ UNDER DEVELOPMENT ]</p>
+            <button class="btn btn-full" onclick="closeModal('widgetsModal')">Close</button>
         </div>
     </div>
 
     <div id="documentModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 data-i18n="createNewDocTitle">Create New Document</h3>
+            <h3>Create New Document</h3>
             <form id="documentForm" style="margin-top: 15px;">
-                <div class="form-group"><label data-i18n="docTitleLabel">Document Title *</label><input type="text" id="docTitle" placeholder="e.g. Report Summary" required></div>
+                <div class="form-group"><label>Document Title *</label><input type="text" id="docTitle" placeholder="e.g. Report Summary" required></div>
                 <div class="form-group">
-                    <label data-i18n="docFontLabel">Font Styling / Weight</label>
+                    <label>Font Styling / Weight</label>
                     <select id="docFontWeight">
                         <option value="normal">Normal Style</option>
                         <option value="bold">Bold Text</option>
@@ -741,1046 +318,12 @@
                         <option value="underline">Underline Text</option>
                     </select>
                 </div>
-                <div class="form-group"><label data-i18n="docContentLabel">Document Content Body *</label><textarea id="docContent" rows="6" required></textarea></div>
-                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')" data-i18n="cancelBtn">Cancel</button><button type="submit" class="btn" data-i18n="saveDocBtn">Save Document</button></div>
+                <div class="form-group"><label>Document Content Body *</label><textarea id="docContent" rows="6" placeholder="Type text here..." required></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('documentModal')">Cancel</button><button type="submit" class="btn">Save Document</button></div>
             </form>
         </div>
     </div>
 
-<script>
-		// --- СЛОВАРЬ ЛОКАЛИЗАЦИИ (i18n) ---
-		const i18n = {
-			en: {
-				appTitle: "Interactive Dashboard",
-				authDesc: "For secure login and automatic synchronization with your corporate mail, log in using your Google account.",
-				googleLoginBtn: "Log In via Google",
-				setupTitle: "Complete Registration",
-				setupDesc: "Please provide your details to build a worker profile.",
-				uploadLogoLabel: "Profile Logo / Avatar",
-				firstNameLabel: "First Name",
-				lastNameLabel: "Last Name",
-				ageLabel: "Age",
-				ageErrorMsg: "Registration is only allowed for ages 7 and older!",
-				createProfileBtn: "Create Profile",
-				phoneTitle: "Phone Interface",
-				contactsHeader: "Contacts",
-				createContactBtn: "Create Contact",
-				makeCallHeader: "Make a Call",
-				registerNumberBtn: "Register Number",
-				destinationLabel: "Enter destination number",
-				callBtn: "Call",
-				companyTitle: "Company Hub",
-				unregisteredCompany: "Not registered in any company",
-				choiceCompanyBtn: "Register / Join Company",
-				membersDirectory: "Members Directory",
-				workspaceActions: "Workspace Actions",
-				addWidgetsBtn: "Add Widgets",
-				companySettingsBtn: "Company Settings",
-				workspacePlaceholder: "Select an action above to manage your corporate assets.",
-				documentsTitle: "Documents Panel",
-				createDocumentBtn: "Create Document",
-				mailTitle: "Gmail Portal",
-				syncMail: "Mail synchronization...",
-				composeMailBtn: "✏️ Compose",
-				settingsTitle: "Settings",
-				appThemeTitle: "App Theme",
-				themeLight: "Light",
-				themeDark: "Dark",
-				appLanguageTitle: "App Language",
-				personalInfoTitle: "Personal Information",
-				emailLabel: "Email Address",
-				saveChangesBtn: "Save Changes",
-				logOutBtn: "Log Out",
-				newMsgTitle: "New Message",
-				mailToLabel: "To *",
-				mailSubjectLabel: "Subject",
-				mailBodyLabel: "Message Text *",
-				cancelBtn: "Cancel",
-				sendBtn: "Send",
-				mailFromLabel: "From:",
-				replyBtn: "↩️ Reply",
-				quickReplyTitle: "Quick Reply",
-				closeBtn: "Close",
-				sendReplyBtn: "Send Reply",
-				createContactModalTitle: "Create New Contact",
-				phoneNumberLabel: "Phone Number *",
-				saveContactBtn: "Save Contact",
-				registerVirtualNumberTitle: "Register Virtual Number",
-				selectRegionLabel: "Select Region",
-				chooseNumberLabel: "Choose a Number",
-				registerBtn: "Register",
-				companyHubRegistryTitle: "Company Hub Registry",
-				createCompanyBtn: "Create Company",
-				joinCompanyBtn: "Join Existing Company",
-				establishCompanyTitle: "Establish New Company",
-				companyNameLabel: "Company Name *",
-				companyAddressLabel: "Company Address",
-				companyBioLabel: "Company Bio *",
-				logoUrlLabel: "Logo URL",
-				createLaunchBtn: "Create & Launch",
-				joinCorporateTitle: "Join Corporate Network",
-				enterTokenLabel: "Enter Corporate Token",
-				authenticateBtn: "Authenticate",
-				corporateControlTitle: "Corporate Control Center",
-				modifyProfileHeader: "Modify Profile",
-				applyUpdatesBtn: "Apply Profile Updates",
-				accessTokensHeader: "Access Tokens",
-				generateInviteBtn: "Generate Invitation Code",
-				roleArchitectureHeader: "Role Architecture Config",
-				roleTitleLabel: "Role Title",
-				permEditProfileLabel: "Allow Profile Modification",
-				permEditRolesLabel: "Allow Role Modifications",
-				permAddWidgetsLabel: "Allow Extension/Widget Deployment",
-				deployRoleBtn: "Deploy Custom Role",
-				dismissBtn: "Dismiss",
-				widgetEcosystemTitle: "Widget Ecosystem Extension",
-				underDevelopment: "[ UNDER DEVELOPMENT ]",
-				createNewDocTitle: "Create New Document",
-				docTitleLabel: "Document Title *",
-				docFontLabel: "Font Styling / Weight",
-				docContentLabel: "Document Content Body *",
-				saveDocBtn: "Save Document",
-                noContacts: "No contacts",
-                noDocs: "No documents available"
-			},
-			ru: {
-				appTitle: "Интерактивная Панель",
-				authDesc: "Для безопасного входа и автоматической синхронизации с вашей корпоративной почтой авторизуйтесь через Google-аккаунт.",
-				googleLoginBtn: "Войти через Google",
-				setupTitle: "Завершение регистрации",
-				setupDesc: "Пожалуйста, укажите ваши данные для создания рабочего профиля.",
-				uploadLogoLabel: "Логотип / Аватар профиля",
-				firstNameLabel: "Имя",
-				lastNameLabel: "Фамилия",
-				ageLabel: "Возраст",
-				ageErrorMsg: "Регистрация разрешена только с 7 лет!",
-				createProfileBtn: "Создать профиль",
-				phoneTitle: "Телефонный интерфейс",
-				contactsHeader: "Контакты",
-				createContactBtn: "Создать контакт",
-				makeCallHeader: "Совершить звонок",
-				registerNumberBtn: "Регистрация номера",
-				destinationLabel: "Введите номер назначения",
-				callBtn: "Позвонить",
-				companyTitle: "Центр Компании",
-				unregisteredCompany: "Не зарегистрирован ни в одной компании",
-				choiceCompanyBtn: "Создать / Войти в компанию",
-				membersDirectory: "Список участников",
-				workspaceActions: "Действия рабочей среды",
-				addWidgetsBtn: "Добавить виджеты",
-				companySettingsBtn: "Настройки компании",
-				workspacePlaceholder: "Выберите действие выше для управления корпоративными активами.",
-				documentsTitle: "Панель документов",
-				createDocumentBtn: "Создать документ",
-				mailTitle: "Портал Gmail",
-				syncMail: "Синхронизация почты...",
-				composeMailBtn: "✏️ Написать",
-				settingsTitle: "Настройки",
-				appThemeTitle: "Тема приложения",
-				themeLight: "Светлая",
-				themeDark: "Темная",
-				appLanguageTitle: "Язык приложения",
-				personalInfoTitle: "Личная информация",
-				emailLabel: "Email адрес",
-				saveChangesBtn: "Сохранить изменения",
-				logOutBtn: "Выйти из системы",
-				newMsgTitle: "Новое сообщение",
-				mailToLabel: "Кому *",
-				mailSubjectLabel: "Тема",
-				mailBodyLabel: "Текст сообщения *",
-				cancelBtn: "Отмена",
-				sendBtn: "Отправить",
-				mailFromLabel: "От:",
-				replyBtn: "↩️ Ответить",
-				quickReplyTitle: "Быстрый ответ",
-				closeBtn: "Закрыть",
-				sendReplyBtn: "Отправить ответ",
-				createContactModalTitle: "Создать новый контакт",
-				phoneNumberLabel: "Номер телефона *",
-				saveContactBtn: "Сохранить контакт",
-				registerVirtualNumberTitle: "Регистрация виртуального номера",
-				selectRegionLabel: "Выберите регион",
-				chooseNumberLabel: "Выберите номер",
-				registerBtn: "Зарегистрировать",
-				companyHubRegistryTitle: "Реестр Центра Компаний",
-				createCompanyBtn: "Создать компанию",
-				joinCompanyBtn: "Присоединиться к компании",
-				establishCompanyTitle: "Основать новую компанию",
-				companyNameLabel: "Название компании *",
-				companyAddressLabel: "Адрес компании",
-				companyBioLabel: "Описание компании *",
-				logoUrlLabel: "Ссылка на логотип",
-				createLaunchBtn: "Создать и запустить",
-				joinCorporateTitle: "Присоединиться к корпоративной сети",
-				enterTokenLabel: "Введите корпоративный токен",
-				authenticateBtn: "Аутентификация",
-				corporateControlTitle: "Корпоративный центр управления",
-				modifyProfileHeader: "Изменить профиль",
-				applyUpdatesBtn: "Применить обновления",
-				accessTokensHeader: "Токены доступа",
-				generateInviteBtn: "Создать код приглашения",
-				roleArchitectureHeader: "Конфигурация архитектуры ролей",
-				roleTitleLabel: "Название роли",
-				permEditProfileLabel: "Разрешить изменение профиля",
-				permEditRolesLabel: "Разрешить изменение ролей",
-				permAddWidgetsLabel: "Разрешить развертывание виджетов",
-				deployRoleBtn: "Развернуть кастомную роль",
-				dismissBtn: "Закрыть",
-				widgetEcosystemTitle: "Расширение экосистемы виджетов",
-				underDevelopment: "[ В РАЗРАБОТКЕ ]",
-				createNewDocTitle: "Создать новый документ",
-				docTitleLabel: "Название документа *",
-				docFontLabel: "Стиль шрифта / Начертание",
-				docContentLabel: "Тело содержимого документа *",
-				saveDocBtn: "Сохранить документ",
-                noContacts: "Нет контактов",
-                noDocs: "Нет доступных документов"
-			},
-			he: {
-				appTitle: "לוח בקרה אינטראקטיבי",
-				authDesc: "לכניסה מאובטחת וסנכרון אוטומטי עם הדוא\"ל הארגוני שלך, התחבר באמצעות חשבון הגוגל שלך.",
-				googleLoginBtn: "התחבר באמצעות Google",
-				setupTitle: "השלמת הרשמה",
-				setupDesc: "אנא ספק את הפרטים שלך כדי לבנות פרופיל עובד.",
-				uploadLogoLabel: "לוגו / אווטאר פרופיל",
-				firstNameLabel: "שם פרטי",
-				lastNameLabel: "שם משפחה",
-				ageLabel: "גיל",
-				ageErrorMsg: "הרשמה מותרת מגיל 7 ומעלה בלבד!",
-				createProfileBtn: "צור פרופיל",
-				phoneTitle: "ממשק טלפון",
-				contactsHeader: "אנשי קשר",
-				createContactBtn: "צור איש קשר",
-				makeCallHeader: "בצע שיחה",
-				registerNumberBtn: "רשום מספר",
-				destinationLabel: "הזן מספר יעד",
-				callBtn: "התקשר",
-				companyTitle: "מרכז החברה",
-				unregisteredCompany: "לא רשום באף חברה",
-				choiceCompanyBtn: "הרשמה / הצטרפות לחברה",
-				membersDirectory: "ספריית חברים",
-				workspaceActions: "פעולות סביבת עבודה",
-				addWidgetsBtn: "הוסף ווידג'טים",
-				companySettingsBtn: "הגדרות חברה",
-				workspacePlaceholder: "בחר פעולה שלמעלה כדי לנהל את הנכסים הארגוניים שלך.",
-				documentsTitle: "פאנל מסמכים",
-				createDocumentBtn: "צור מסמך",
-				mailTitle: "פורטל Gmail",
-				syncMail: "סנכרון דואר...",
-				composeMailBtn: "✏️ כתוב הודעה",
-				settingsTitle: "הגדרות",
-				appThemeTitle: "נושא האפליקציה",
-				themeLight: "בהיר",
-				themeDark: "כהה",
-				appLanguageTitle: "שפת האפליקציה",
-				personalInfoTitle: "מידע אישי",
-				emailLabel: "כתובת אימייל",
-				saveChangesBtn: "שמור שינויים",
-				logOutBtn: "התנתק",
-				newMsgTitle: "הודעה חדשה",
-				mailToLabel: "אל *",
-				mailSubjectLabel: "נושא",
-				mailBodyLabel: "תוכן ההודעה *",
-				cancelBtn: "ביטול",
-				sendBtn: "שלח",
-				mailFromLabel: "מאת:",
-				replyBtn: "↩️ השב",
-				quickReplyTitle: "תגובה מהירה",
-				closeBtn: "סגור",
-				sendReplyBtn: "שלח תגובה",
-				createContactModalTitle: "צור איש קשר חדש",
-				phoneNumberLabel: "מספר טלפון *",
-				saveContactBtn: "שמור איש קשר",
-				registerVirtualNumberTitle: "רישום מספר וירטואלי",
-				selectRegionLabel: "בחר אזור",
-				chooseNumberLabel: "בחר מספר",
-				registerBtn: "הרשם",
-				companyHubRegistryTitle: "רישום מרכז החברה",
-				createCompanyBtn: "צור חברה",
-				joinCompanyBtn: "הצטרף לחברה קיימת",
-				establishCompanyTitle: "הקם חברה חדשה",
-				companyNameLabel: "שם החברה *",
-				companyAddressLabel: "כתובת החברה",
-				companyBioLabel: "תיאור החברה *",
-				logoUrlLabel: "קישור ללוגו",
-				createLaunchBtn: "צור והשקע",
-				joinCorporateTitle: "הצטרף לרשת הארגונית",
-				enterTokenLabel: "הזן אסימון ארגוני",
-				authenticateBtn: "אמת",
-				corporateControlTitle: "מרכז בקרה ארגוני",
-				modifyProfileHeader: "עדכן פרופיל",
-				applyUpdatesBtn: "החל עדכוני פרופיל",
-				accessTokensHeader: "אסימוני גישה",
-				generateInviteBtn: "צור קוד הזמנה",
-				roleArchitectureHeader: "תצורת ארכיטקטורת תפקידים",
-				roleTitleLabel: "שם התפקיד",
-				permEditProfileLabel: "אפשר שינוי פרופיל",
-				permEditRolesLabel: "אפשר שינוי תפקידים",
-				permAddWidgetsLabel: "אפשר פריסת ווידג'טים",
-				deployRoleBtn: "פרוס תפקיד מותאם אישית",
-				dismissBtn: "סגור",
-				widgetEcosystemTitle: "הרחבת מערכת הווידג'טים",
-				underDevelopment: "[ בפתיוח ]",
-				createNewDocTitle: "צור מסמך חדש",
-				docTitleLabel: "כותרת המסמך *",
-				docFontLabel: "סגנון גופן / משקל",
-				docContentLabel: "גוף תוכן המסמך *",
-				saveDocBtn: "שמור מסמך",
-                noContacts: "אין אנשי קשר",
-                noDocs: "אין מסמכים זמינים"
-			},
-			ar: {
-				appTitle: "لوحة التحكم التفاعلية",
-				authDesc: "لتسجيل الدخول الآمن والمزامنة التلقائية مع بريدك الإلكتروني المؤسسي، يرجى تسجيل الدخول باستخدام حساب Google الخاص بك.",
-				googleLoginBtn: "تسجيل الدخول عبر Google",
-				setupTitle: "إكمال التسجيل",
-				setupDesc: "يرجى تقديم التفاصيل الخاصة بك لإنشاء ملف تعريف العمل.",
-				uploadLogoLabel: "شعار / صورة الملف الشخصي",
-				firstNameLabel: "الاسم الأول",
-				lastNameLabel: "اسم العائلة",
-				ageLabel: "العمر",
-				ageErrorMsg: "التسجيل متاح فقط للأعمار من 7 سنوات فما فوق!",
-				createProfileBtn: "إنشاء ملف التعريف",
-				phoneTitle: "واجهة الهاتف",
-				contactsHeader: "جهات الاتصال",
-				createContactBtn: "إنشاء جهة اتصال",
-				makeCallHeader: "إجراء مكالمة",
-				registerNumberBtn: "تسجيل الرقم",
-				destinationLabel: "أدخل الرقم المطلوب",
-				callBtn: "اتصال",
-				companyTitle: "مركز الشركة",
-				unregisteredCompany: "غير مسجل في أي شركة",
-				choiceCompanyBtn: "تسجيل / الانضمام إلى شركة",
-				membersDirectory: "دليل الأعضاء",
-				workspaceActions: "إجراءات مساحة العمل",
-				addWidgetsBtn: "إضافة أدوات",
-				companySettingsBtn: "إعدادات الشركة",
-				workspacePlaceholder: "حدد إجراءً أعلاه لإدارة أصول الشركة الخاصة بك.",
-				documentsTitle: "لوحة المستندات",
-				createDocumentBtn: "إنشاء مستند",
-				mailTitle: "بوابة Gmail",
-				syncMail: "مزامنة البريد...",
-				composeMailBtn: "✏️ إنشاء رسالة",
-				settingsTitle: "الإعدادات",
-				appThemeTitle: "مظهر التطبيق",
-				themeLight: "فاتح",
-				themeDark: "داكن",
-				appLanguageTitle: "لغة التطبيق",
-				personalInfoTitle: "المعلومات الشخصية",
-				emailLabel: "البريد الإلكتروني",
-				saveChangesBtn: "حفظ التغييرات",
-				logOutBtn: "تسجيل الخروج",
-				newMsgTitle: "رسالة جديدة",
-				mailToLabel: "إلى *",
-				mailSubjectLabel: "الموضوع",
-				mailBodyLabel: "نص الرسالة *",
-				cancelBtn: "إلغاء",
-				sendBtn: "إرسال",
-				mailFromLabel: "من:",
-				replyBtn: "↩️ رد",
-				quickReplyTitle: "رد سريع",
-				closeBtn: "إغلاق",
-				sendReplyBtn: "إرسال الرد",
-				createContactModalTitle: "إنشاء جهة اتصال جديدة",
-				phoneNumberLabel: "رقم الهاتف *",
-				saveContactBtn: "حفظ جهة الاتصال",
-				registerVirtualNumberTitle: "تسجيل رقم افتراضي",
-				selectRegionLabel: "اختر المنطقة",
-				chooseNumberLabel: "اختر الرقم",
-				registerBtn: "تسجيل",
-				companyHubRegistryTitle: "سجل مركز الشركة",
-				createCompanyBtn: "إنشاء شركة",
-				joinCompanyBtn: "الانضمام إلى شركة قائمة",
-				establishCompanyTitle: "تأسيس شركة جديدة",
-				companyNameLabel: "اسم الشركة *",
-				companyAddressLabel: "عنوان الشركة",
-				companyBioLabel: "وصف الشركة *",
-				logoUrlLabel: "رابط الشعار",
-				createLaunchBtn: "إنشاء وإطلاق",
-				joinCorporateTitle: "الانضمام إلى شبكة الشركات",
-				enterTokenLabel: "أدخل رمز الشركة",
-				authenticateBtn: "مصادقة",
-				corporateControlTitle: "مركز التحكم في الشركة",
-				modifyProfileHeader: "تعديل الملف الشخصي",
-				applyUpdatesBtn: "تطبيق التحديثات",
-				accessTokensHeader: "رموز الوصول",
-				generateInviteBtn: "توليد رمز الدعوة",
-				roleArchitectureHeader: "تكوين بنية الأدوار",
-				roleTitleLabel: "عنوان الدور",
-				permEditProfileLabel: "السماح بتعديل الملف الشخصي",
-				permEditRolesLabel: "السماح بتعديل الأدوار",
-				permAddWidgetsLabel: "السماح بنشر الأدوات",
-				deployRoleBtn: "نشر دور مخصص",
-				dismissBtn: "إلغاء",
-				widgetEcosystemTitle: "توسيع منظومة الأدوات",
-				underDevelopment: "[ قيد التطوير ]",
-				createNewDocTitle: "إنشاء مستند جديد",
-				docTitleLabel: "عنوان المستند *",
-				docFontLabel: "تنسيق الخط / الوزن",
-				docContentLabel: "نص محتوى المستند *",
-				saveDocBtn: "حفظ المستند",
-                noContacts: "لا توجد جهات اتصال",
-                noDocs: "لا توجد مستندات متاحة"
-			},
-			es: {
-				appTitle: "Tablero Interactivo",
-				authDesc: "Para un inicio de sesión seguro y sincronización automática con su correo corporativo, inicie sesión con su cuenta de Google.",
-				googleLoginBtn: "Iniciar sesión con Google",
-				setupTitle: "Completar Registro",
-				setupDesc: "Por favor, proporcione sus datos para crear un perfil de trabajo.",
-				uploadLogoLabel: "Logotipo / Avatar del perfil",
-				firstNameLabel: "Nombre",
-				lastNameLabel: "Apellido",
-				ageLabel: "Edad",
-				ageErrorMsg: "¡El registro solo se permite para mayores de 7 años!",
-				createProfileBtn: "Crear perfil",
-				phoneTitle: "Interfaz Telefónica",
-				contactsHeader: "Contactos",
-				createContactBtn: "Crear Contacto",
-				makeCallHeader: "Hacer una llamada",
-				registerNumberBtn: "Registrar Número",
-				destinationLabel: "Ingrese el número de destino",
-				callBtn: "Llamar",
-				companyTitle: "Centro de la Compañía",
-				unregisteredCompany: "No registrado en ninguna compañía",
-				choiceCompanyBtn: "Registrar / Unirse a Compañía",
-				membersDirectory: "Directorio de Miembros",
-				workspaceActions: "Acciones del espacio de trabajo",
-				addWidgetsBtn: "Agregar Widgets",
-				companySettingsBtn: "Configuración de la empresa",
-				workspacePlaceholder: "Seleccione una acción anterior para administrar sus activos corporativos.",
-				documentsTitle: "Panel de Documentos",
-				createDocumentBtn: "Crear Documento",
-				mailTitle: "Portal de Gmail",
-				syncMail: "Sincronización de correo...",
-				composeMailBtn: "✏️ Redactar",
-				settingsTitle: "Configuración",
-				appThemeTitle: "Tema de la aplicación",
-				themeLight: "Claro",
-				themeDark: "Oscuro",
-				appLanguageTitle: "Idioma de la aplicación",
-				personalInfoTitle: "Información Personal",
-				emailLabel: "Correo Electrónico",
-				saveChangesBtn: "Guardar Cambios",
-				logOutBtn: "Cerrar Sesión",
-				newMsgTitle: "Nuevo Mensaje",
-				mailToLabel: "Para *",
-				mailSubjectLabel: "Asunto",
-				mailBodyLabel: "Texto del Mensaje *",
-				cancelBtn: "Cancelar",
-				sendBtn: "Enviar",
-				mailFromLabel: "De:",
-				replyBtn: "↩️ Responder",
-				quickReplyTitle: "Respuesta Rápida",
-				closeBtn: "Cerrar",
-				sendReplyBtn: "Enviar Respuesta",
-				createContactModalTitle: "Crear Nuevo Contacto",
-				phoneNumberLabel: "Número de Teléfono *",
-				saveContactBtn: "Guardar Contacto",
-				registerVirtualNumberTitle: "Registrar Número Virtual",
-				selectRegionLabel: "Seleccionar Región",
-				chooseNumberLabel: "Elegir un Número",
-				registerBtn: "Registrar",
-				companyHubRegistryTitle: "Registro de Centro de Compañías",
-				createCompanyBtn: "Crear Compañía",
-				joinCompanyBtn: "Unirse a Compañía Existente",
-				establishCompanyTitle: "Establecer Nueva Compañía",
-				companyNameLabel: "Nombre de la Compañía *",
-				companyAddressLabel: "Dirección de la Compañía",
-				companyBioLabel: "Descripción de la Compañía *",
-				logoUrlLabel: "URL del Logotipo",
-				createLaunchBtn: "Crear y Lanzar",
-				joinCorporateTitle: "Unirse a la Red Corporativa",
-				enterTokenLabel: "Ingrese el Token Corporativo",
-				authenticateBtn: "Autenticar",
-				corporateControlTitle: "Centro de Control Corporativo",
-				modifyProfileHeader: "Modificar Perfil",
-				applyUpdatesBtn: "Aplicar Actualizaciones",
-				accessTokensHeader: "Tokens de Acceso",
-				generateInviteBtn: "Generar Código de Invitación",
-				roleArchitectureHeader: "Configuración de Roles",
-				roleTitleLabel: "Título del Rol",
-				permEditProfileLabel: "Permitir Modificación de Perfil",
-				permEditRolesLabel: "Permitir Modificación de Roles",
-				permAddWidgetsLabel: "Permitir Despliegue de Widgets",
-				deployRoleBtn: "Desplegar Rol Personalizado",
-				dismissBtn: "Descartar",
-				widgetEcosystemTitle: "Extensión del Ecosistema de Widgets",
-				underDevelopment: "[ EN DESARROLLO ]",
-				createNewDocTitle: "Crear Nuevo Documento",
-				docTitleLabel: "Título del Documento *",
-				docFontLabel: "Estilo de Fuente / Peso",
-				docContentLabel: "Cuerpo del Documento *",
-				saveDocBtn: "Guardar Documento",
-                noContacts: "No hay contactos",
-                noDocs: "No hay documentos disponibles"
-			},
-			fr: {
-				appTitle: "Tableau de Bord Interactif",
-				authDesc: "Pour une connexion sécurisée et une synchronisation automatique avec votre messagerie d'entreprise, connectez-vous avec votre compte Google.",
-				googleLoginBtn: "Se connecter via Google",
-				setupTitle: "Compléter l'inscription",
-				setupDesc: "Veuillez fournir vos coordonnées для создания профиля.",
-				uploadLogoLabel: "Logo / Avatar du profil",
-				firstNameLabel: "Prénom",
-				lastNameLabel: "Nom",
-				ageLabel: "Âge",
-				ageErrorMsg: "L'inscription est autorisée uniquement pour les personnes de 7 ans et plus !",
-				createProfileBtn: "Créer le profil",
-				phoneTitle: "Interface Téléphonique",
-				contactsHeader: "Contacts",
-				createContactBtn: "Créer un contact",
-				makeCallHeader: "Passer un appel",
-				registerNumberBtn: "Enregistrer un numéro",
-				destinationLabel: "Entrez le numéro de destination",
-				callBtn: "Appeler",
-				companyTitle: "Centre de l'Entreprise",
-				unregisteredCompany: "Non inscrit dans une entreprise",
-				choiceCompanyBtn: "Créer / Rejoindre une entreprise",
-				membersDirectory: "Répertoire des membres",
-				workspaceActions: "Actions de l'espace de travail",
-				addWidgetsBtn: "Ajouter des widgets",
-				companySettingsBtn: "Paramètres de l'entreprise",
-				workspacePlaceholder: "Sélectionnez une action ci-dessus pour gérer vos actifs d'entreprise.",
-				documentsTitle: "Panneau des Documents",
-				createDocumentBtn: "Créer un document",
-				mailTitle: "Portail Gmail",
-				syncMail: "Synchronisation de la messagerie...",
-				composeMailBtn: "✏️ Rédiger",
-				settingsTitle: "Paramètres",
-				appThemeTitle: "Thème de l'application",
-				themeLight: "Clair",
-				themeDark: "Sombre",
-				appLanguageTitle: "Langue de l'application",
-				personalInfoTitle: "Informations Personnelles",
-				emailLabel: "Adresse e-mail",
-				saveChangesBtn: "Enregistrer les modifications",
-				logOutBtn: "Se déconnecter",
-				newMsgTitle: "Nouveau Message",
-				mailToLabel: "À *",
-				mailSubjectLabel: "Objet",
-				mailBodyLabel: "Corps du message *",
-				cancelBtn: "Annuler",
-				sendBtn: "Envoyer",
-				mailFromLabel: "De :",
-				replyBtn: "↩️ Répondre",
-				quickReplyTitle: "Réponse Rapide",
-				closeBtn: "Fermer",
-				sendReplyBtn: "Envoyer la réponse",
-				createContactModalTitle: "Créer un nouveau contact",
-				phoneNumberLabel: "Numéro de téléphone *",
-				saveContactBtn: "Enregistrer le contact",
-				registerVirtualNumberTitle: "Enregistrer un numéro virtuel",
-				selectRegionLabel: "Sélectionner la région",
-				chooseNumberLabel: "Choisir un numéro",
-				registerBtn: "S'inscrire",
-				companyHubRegistryTitle: "Registre du Centre d'Entreprise",
-				createCompanyBtn: "Créer une entreprise",
-				joinCompanyBtn: "Rejoindre une entreprise existante",
-				establishCompanyTitle: "Créer une nouvelle entreprise",
-				companyNameLabel: "Nom de l'entreprise *",
-				companyAddressLabel: "Adresse de l'entreprise",
-				companyBioLabel: "Description de l'entreprise *",
-				logoUrlLabel: "URL du logo",
-				createLaunchBtn: "Créer & Lancer",
-				joinCorporateTitle: "Rejoindre le réseau d'entreprise",
-				enterTokenLabel: "Entrez le jeton d'entreprise",
-				authenticateBtn: "Authentifier",
-				corporateControlTitle: "Centre de contrôle de l'entreprise",
-				modifyProfileHeader: "Modifier le profil",
-				applyUpdatesBtn: "Appliquer les mises à jour",
-				accessTokensHeader: "Jetons d'accès",
-				generateInviteBtn: "Générer un code d'invitation",
-				roleArchitectureHeader: "Configuration des rôles",
-				roleTitleLabel: "Titre du rôle",
-				permEditProfileLabel: "Autoriser la modification du profil",
-				permEditRolesLabel: "Autoriser la modification des rôles",
-				permAddWidgetsLabel: "Autoriser le déploiement de widgets",
-				deployRoleBtn: "Déployer le rôle personnalisé",
-				dismissBtn: "Fermer",
-				widgetEcosystemTitle: "Extension de l'écosystème de widgets",
-				underDevelopment: "[ EN DÉVELOPPEMENT ]",
-				createNewDocTitle: "Créer un nouveau document",
-				docTitleLabel: "Titre du document *",
-				docFontLabel: "Style de police / Poids",
-				docContentLabel: "Corps du document *",
-				saveDocBtn: "Enregistrer le document",
-                noContacts: "Aucun contact",
-                noDocs: "Aucun document disponible"
-			}
-		};
-
-		// --- КОНФИГУРАЦИЯ GOOGLE AUTH ---
-		const CLIENT_ID = '565975442884-sea3ig36td6ofhsd2932oo8rjcp7j5kl.apps.googleusercontent.com';
-		const SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
-		
-        let tokenClient;
-		let accessToken = null;
-		let currentAccountCode = null; 
-        let selectedGmailMsg = null;
-        let tempGoogleEmail = null;
-        let base64AvatarData = null; // Для хранения картинки логотипа в Base64
-
-		window.onload = function() {
-			const savedTheme = localStorage.getItem('site-theme') || 'light';
-			setTheme(savedTheme);
-            
-            // Инициализация языка
-            const savedLang = localStorage.getItem('site-lang') || 'en';
-            changeLanguage(savedLang);
-            
-            initGoogleAuth();
-            setupAvatarListeners();
-		};
-
-        // Логика переключения языков
-        function changeLanguage(lang) {
-            localStorage.setItem('site-lang', lang);
-            document.getElementById('langSelect').value = lang;
-            
-            // Если выбран Иврит или Арабский — включаем RTL режим чтения справа налево
-            if (lang === 'he' || lang === 'ar') {
-                document.body.classList.add('rtl');
-            } else {
-                document.body.classList.remove('rtl');
-            }
-            
-            // Переводим все элементы с атрибутом data-i18n
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[lang] && i18n[lang][key]) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = i18n[lang][key];
-                    } else {
-                        el.textContent = i18n[lang][key];
-                    }
-                }
-            });
-
-            // Перерисовываем списки, так как плейсхолдеры внутри функций тоже зависят от языка
-            if(currentAccountCode) {
-                renderContacts();
-                renderDocuments();
-                renderCompanyView();
-            }
-        }
-
-        // Слушатель загрузки картинок (FileReader)
-        function setupAvatarListeners() {
-            const handleAvatarFile = (e, previewId) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        base64AvatarData = event.target.result;
-                        document.getElementById(previewId).innerHTML = `<img src="${base64AvatarData}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-
-            document.getElementById('setupAvatarInput').onchange = (e) => handleAvatarFile(e, 'setupAvatarPreview');
-            document.getElementById('editAvatarInput').onchange = (e) => {
-                handleAvatarFile(e, 'editAvatarPreview');
-                // Если меняем аватар в настройках, сразу даем возможность сохранить изменения
-                const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-                if (userData) {
-                    userData.avatar = base64AvatarData;
-                    localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-                    updateSidebarAndSettingsAvatar(base64AvatarData);
-                }
-            };
-        }
-
-		function initGoogleAuth() {
-			const script = document.createElement('script');
-			script.src = "https://accounts.google.com/gsi/client";
-			script.onload = () => {
-				tokenClient = google.accounts.oauth2.initTokenClient({
-					client_id: CLIENT_ID,
-					scope: SCOPES,
-					callback: async (tokenResponse) => {
-						if (tokenResponse && tokenResponse.access_token) {
-							accessToken = tokenResponse.access_token;
-							await handleGoogleAuthSuccess();
-						}
-					},
-				});
-				setupGmailButtons();
-			};
-			document.head.appendChild(script);
-		}
-
-		function setupGmailButtons() {
-			const loginBtn = document.getElementById('btn-google-login');
-			if (loginBtn) {
-				loginBtn.onclick = () => {
-					tokenClient.requestAccessToken({ prompt: 'consent' });
-				};
-			}
-            document.getElementById('gmailComposeForm').onsubmit = async (e) => { e.preventDefault(); await sendGmailMessage(); };
-            document.getElementById('gmailReplyForm').onsubmit = async (e) => { e.preventDefault(); await sendGmailReply(); };
-		}
-
-        async function handleGoogleAuthSuccess() {
-            try {
-                const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
-					headers: { 'Authorization': `Bearer ${accessToken}` }
-				});
-				const profile = await profileRes.json();
-                const userEmail = profile.emailAddress;
-                tempGoogleEmail = userEmail;
-
-                if (localStorage.getItem('user_' + userEmail)) {
-                    completeLogin(userEmail);
-                } else {
-                    document.getElementById('authWindow').style.display = 'none';
-                    document.getElementById('setupProfileWindow').style.display = 'block';
-                }
-            } catch (err) {
-                alert('Google Auth Error: ' + err.message);
-            }
-        }
-
-        document.getElementById('profileSetupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const firstname = document.getElementById('setupFirstname').value;
-			const lastname = document.getElementById('setupLastname').value;
-			const age = parseInt(document.getElementById('setupAge').value);
-
-			if (age < 7) {
-				document.getElementById('ageSetupError').style.display = 'block';
-				return;
-			}
-
-            const userData = { firstname, lastname, age, email: tempGoogleEmail, avatar: base64AvatarData, contacts: [], registeredNumbers: [], companyId: null, companyRole: null, documents: [] };
-			localStorage.setItem('user_' + tempGoogleEmail, JSON.stringify(userData));
-            
-            document.getElementById('setupProfileWindow').style.display = 'none';
-            completeLogin(tempGoogleEmail);
-        });
-
-        function updateSidebarAndSettingsAvatar(avatarData) {
-            const currentLang = localStorage.getItem('site-lang') || 'en';
-            const blocks = [document.getElementById('sidebarAvatar'), document.getElementById('editAvatarPreview')];
-            blocks.forEach(block => {
-                if(block) {
-                    if (avatarData) {
-                        block.innerHTML = `<img src="${avatarData}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                    } else {
-                        block.textContent = "👤";
-                    }
-                }
-            });
-        }
-
-        function completeLogin(email) {
-            currentAccountCode = email;
-            document.getElementById('authWindow').style.display = 'none';
-			document.getElementById('mainApp').style.display = 'flex';
-			
-			const userData = JSON.parse(localStorage.getItem('user_' + email));
-			document.getElementById('editFirstname').value = userData.firstname;
-			document.getElementById('editLastname').value = userData.lastname;
-			document.getElementById('editEmail').value = userData.email;
-
-            // Рендерим аватарку пользователя
-            base64AvatarData = userData.avatar || null;
-            updateSidebarAndSettingsAvatar(base64AvatarData);
-
-			renderContacts();
-			updateMyNumbersDropdown();
-			renderCompanyView();
-			renderDocuments();
-			loadGmailData();
-
-			const firstBtn = document.querySelector('.nav-btn');
-			switchPage('page-phone', firstBtn);
-        }
-
-		async function loadGmailData() {
-			try {
-				const userEmailEl = document.getElementById('user-email');
-				if (userEmailEl) userEmailEl.textContent = currentAccountCode;
-
-				const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5', {
-					headers: { 'Authorization': `Bearer ${accessToken}` }
-				});
-				const data = await res.json();
-				const container = document.getElementById('emails-list');
-				if (!container) return;
-				container.innerHTML = '';
-
-				if (!data.messages || data.messages.length === 0) {
-					container.innerHTML = '<p style="text-align:center; padding:20px;">No messages found.</p>';
-					return;
-				}
-
-				for (let msg of data.messages) {
-					const detailRes = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
-						headers: { 'Authorization': `Bearer ${accessToken}` }
-					});
-					const detail = await detailRes.json();
-					const headers = detail.payload.headers;
-					const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-					const from = headers.find(h => h.name === 'From')?.value || 'Unknown Sender';
-                    const messageId = headers.find(h => h.name === 'Message-ID')?.value || '';
-
-                    let parsedBody = "";
-                    if (detail.payload.body && detail.payload.body.data) {
-                        parsedBody = atob(detail.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-                    } else if (detail.payload.parts) {
-                        const textPart = detail.payload.parts.find(p => p.mimeType === 'text/plain' || p.mimeType === 'text/html');
-                        if (textPart && textPart.body && textPart.body.data) {
-                            parsedBody = atob(textPart.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-                        }
-                    }
-                    if(!parsedBody) parsedBody = detail.snippet || "";
-
-                    const emailData = { id: detail.id, threadId: detail.threadId, messageId: messageId, subject: subject, from: from, body: parsedBody };
-
-					const card = document.createElement('div');
-					card.style.cssText = 'padding: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; border-radius: 8px; background: rgba(255,255,255,0.02); text-align: left; cursor: pointer; transition: background 0.2s;';
-					
-                    card.onclick = () => openGmailViewModal(emailData);
-                    card.innerHTML = `
-						<div style="color: var(--accent-color); font-weight: bold; font-size: 13px;">${from.split('<')[0]}</div>
-						<div style="font-weight: 600; margin: 4px 0; color: var(--text-color);">${subject}</div>
-						<div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${detail.snippet || ''}</div>
-					`;
-					container.appendChild(card);
-				}
-			} catch (err) {
-				console.error('Gmail API Error:', err);
-			}
-		}
-
-        async function sendGmailMessage() {
-            const to = document.getElementById('gmailTo').value;
-            const subject = document.getElementById('gmailSubject').value;
-            const body = document.getElementById('gmailBody').value;
-
-            const emailContent = [
-                `To: ${to}`,
-                `Subject: =?utf-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
-                'Content-Type: text/plain; charset="UTF-8"',
-                '',
-                body
-            ].join('\n');
-
-            const base64EncodedEmail = btoa(unescape(encodeURIComponent(emailContent))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-            try {
-                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ raw: base64EncodedEmail })
-                });
-                if (response.ok) {
-                    alert('Success!');
-                    closeModal('gmailComposeModal');
-                    document.getElementById('gmailComposeForm').reset();
-                    loadGmailData();
-                }
-            } catch (err) { alert(err.message); }
-        }
-
-        function openGmailViewModal(email) {
-            selectedGmailMsg = email;
-            document.getElementById('gmailViewSubject').textContent = email.subject;
-            document.getElementById('gmailViewFrom').textContent = email.from;
-            document.getElementById('gmailViewBody').textContent = email.body;
-            document.getElementById('gmailReplyForm').style.display = 'none';
-            document.getElementById('gmailReplyBtn').style.display = 'inline-block';
-            openModal('gmailViewModal');
-        }
-
-        function showGmailReplyForm() {
-            document.getElementById('gmailReplyForm').style.display = 'block';
-            document.getElementById('gmailReplyBtn').style.display = 'none';
-        }
-
-        async function sendGmailReply() {
-            if (!selectedGmailMsg) return;
-            const replyBody = document.getElementById('gmailReplyBody').value;
-            let toEmail = selectedGmailMsg.from;
-            const match = selectedGmailMsg.from.match(/<([^>]+)>/);
-            if (match && match[1]) toEmail = match[1];
-
-            const subject = selectedGmailMsg.subject.startsWith('Re:') ? selectedGmailMsg.subject : `Re: ${selectedGmailMsg.subject}`;
-            let emailHeaders = [ `To: ${toEmail}`, `Subject: =?utf-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`, 'Content-Type: text/plain; charset="UTF-8"' ];
-
-            if (selectedGmailMsg.messageId) {
-                emailHeaders.push(`In-Reply-To: ${selectedGmailMsg.messageId}`);
-                emailHeaders.push(`References: ${selectedGmailMsg.messageId}`);
-            }
-            emailHeaders.push('', replyBody);
-
-            const emailContent = emailHeaders.join('\n');
-            const base64EncodedEmail = btoa(unescape(encodeURIComponent(emailContent))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-            try {
-                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ raw: base64EncodedEmail, threadId: selectedGmailMsg.threadId })
-                });
-                if (response.ok) {
-                    closeModal('gmailViewModal');
-                    loadGmailData();
-                }
-            } catch (err) { console.error(err); }
-        }
-
-		function switchPage(pageId, buttonElement) {
-			document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-			document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-			document.getElementById(pageId).classList.add('active');
-			if(buttonElement) buttonElement.classList.add('active');
-		}
-
-		function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-		function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-		/* --- CONTACTS --- */
-		function renderContacts() {
-            const currentLang = localStorage.getItem('site-lang') || 'en';
-			const container = document.getElementById('contactsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
-			if (!userData.contacts || userData.contacts.length === 0) { container.innerHTML = `<div class="empty-placeholder">${i18n[currentLang].noContacts}</div>`; return; }
-			userData.contacts.forEach(c => {
-				const card = document.createElement('div'); card.className = 'item-card';
-				card.innerHTML = `<h4>${c.firstname} ${c.lastname}</h4><p>Phone: <b>${c.code} ${c.number}</b></p>`; container.appendChild(card);
-			});
-		}
-		document.getElementById('contactForm').addEventListener('submit', function(e) {
-			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			userData.contacts.push({ firstname: document.getElementById('conFirstname').value, lastname: document.getElementById('conLastname').value, code: document.getElementById('conCode').value, number: document.getElementById('conNumber').value });
-			localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); closeModal('contactModal'); this.reset(); renderContacts();
-		});
-
-		/* --- VIRTUAL NUMBERSPool --- */
-		function generateDailyNumbersPool() {
-			const region = document.getElementById('regNumberRegion').value;
-			const select = document.getElementById('regNumberPoolSelect'); select.innerHTML = '';
-			const seed = new Date().toDateString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-			for (let i = 0; i < 4; i++) {
-				let pseudoRandom = Math.abs(Math.sin(seed + i) * 10000000);
-				let num7Digits = Math.floor(pseudoRandom).toString().padEnd(7, '7').substring(0,7);
-				let opt = document.createElement('option'); opt.value = `${region} ${num7Digits}`; opt.textContent = `${region} ${num7Digits}`; select.appendChild(opt);
-			}
-		}
-		function openNumberRegModal() { generateDailyNumbersPool(); openModal('numberRegModal'); }
-		function saveRegisteredNumber() {
-			const selectedNum = document.getElementById('regNumberPoolSelect').value; const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			if(!userData.registeredNumbers.includes(selectedNum)) { userData.registeredNumbers.push(selectedNum); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); updateMyNumbersDropdown(); }
-			closeModal('numberRegModal');
-		}
-		function updateMyNumbersDropdown() {
-			const select = document.getElementById('myNumbersSelect'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); select.innerHTML = '';
-			if(!userData.registeredNumbers || userData.registeredNumbers.length === 0) { select.innerHTML = '<option value="">No active number</option>'; return; }
-			userData.registeredNumbers.forEach(num => { let opt = document.createElement('option'); opt.value = num; opt.textContent = num; select.appendChild(opt); });
-		}
-		function makeCall() {
-			const activeLine = document.getElementById('myNumbersSelect').value;
-			if (!activeLine) { alert('Call not processed. You must register and select an active virtual number first!'); return; }
-			alert(`Dialing from line [${activeLine}] to [${document.getElementById('dialNumberInput').value}]...\nConnection active!`);
-		}
-
-		/* --- COMPANY NETWORK --- */
-		function renderCompanyView() {
-			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			if (!userData.companyId) {
-				document.getElementById('companyStateUnregistered').style.display = 'block'; document.getElementById('companyStateDashboard').style.display = 'none';
-			} else {
-				document.getElementById('companyStateUnregistered').style.display = 'none'; document.getElementById('companyStateDashboard').style.display = 'flex';
-				const globalCompanyData = JSON.parse(localStorage.getItem('company_' + userData.companyId)); if(!globalCompanyData) return;
-				document.getElementById('compDashboardName').textContent = globalCompanyData.name;
-				document.getElementById('compDashboardAddress').textContent = globalCompanyData.address || 'No Address Provided';
-				document.getElementById('compDashboardBio').textContent = globalCompanyData.bio;
-				const logoBox = document.getElementById('compDashboardLogo');
-				if (globalCompanyData.logo) logoBox.innerHTML = `<img src="${globalCompanyData.logo}" class="company-logo-preview" alt="logo">`; else logoBox.innerHTML = '🏢';
-				if (userData.companyRole === 'Administrator') { document.getElementById('compSettingsBtn').style.display = 'block'; } else {
-					const matchedRoleObj = globalCompanyData.roles.find(r => r.title === userData.companyRole);
-					if(matchedRoleObj && (matchedRoleObj.editProfile || matchedRoleObj.editRoles || matchedRoleObj.addWidgets)) document.getElementById('compSettingsBtn').style.display = 'block'; else document.getElementById('compSettingsBtn').style.display = 'none';
-				}
-				const membersContainer = document.getElementById('companyMembersContainer'); membersContainer.innerHTML = '';
-				globalCompanyData.members.forEach(m => { const card = document.createElement('div'); card.className = 'item-card'; card.innerHTML = `<h4>${m.name}</h4><p>Role Position: <b style="color:var(--btn-bg);">${m.role}</b></p>`; membersContainer.appendChild(card); });
-			}
-		}
-		document.getElementById('companyCreateForm').addEventListener('submit', function(e) {
-			e.preventDefault(); const compId = 'COMP-' + Math.random().toString(36).substr(2, 9).toUpperCase(); const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			const companyPayload = { id: compId, name: document.getElementById('creationCompName').value, address: document.getElementById('creationCompAddress').value, bio: document.getElementById('creationCompBio').value, logo: document.getElementById('creationCompLogo').value, creatorCode: currentAccountCode, roles: [], members: [{ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Administrator' }] };
-			localStorage.setItem('company_' + compId, JSON.stringify(companyPayload)); userObj.companyId = compId; userObj.companyRole = 'Administrator'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
-			closeModal('companyCreateModal'); this.reset(); renderCompanyView();
-		});
-		document.getElementById('companyJoinForm').addEventListener('submit', function(e) {
-			e.preventDefault(); const inputtedToken = document.getElementById('joinCompCode').value.trim(); let foundCompany = null;
-			for(let key in localStorage) { if(key.startsWith('company_')) { let cData = JSON.parse(localStorage.getItem(key)); if(cData.activeInviteTokens && cData.activeInviteTokens.includes(inputtedToken)) { foundCompany = cData; break; } } }
-			if(!foundCompany) { alert('Invalid Workspace Token!'); return; }
-			const userObj = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); foundCompany.members.push({ userCode: currentAccountCode, name: `${userObj.firstname} ${userObj.lastname}`, role: 'Employee' });
-			localStorage.setItem('company_' + foundCompany.id, JSON.stringify(foundCompany)); userObj.companyId = foundCompany.id; userObj.companyRole = 'Employee'; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userObj));
-			closeModal('companyJoinForm'); this.reset(); renderCompanyView();
-		});
-		function openCompanySettingsModal() {
-			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-			document.getElementById('setCompName').value = companyData.name; document.getElementById('setCompAddress').value = companyData.address; document.getElementById('setCompBio').value = companyData.bio; document.getElementById('setCompLogo').value = companyData.logo;
-			document.getElementById('inviteCodeDisplay').style.display = 'none'; openModal('companySettingsModal');
-		}
-		function saveCompanyProfileChanges() {
-			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-			companyData.name = document.getElementById('setCompName').value; companyData.address = document.getElementById('setCompAddress').value; companyData.bio = document.getElementById('setCompBio').value; companyData.logo = document.getElementById('setCompLogo').value;
-			localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); renderCompanyView(); alert('Profile updated!');
-		}
-		function generateCompanyInviteToken() {
-			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-			if(!companyData.activeInviteTokens) companyData.activeInviteTokens = []; const generatedToken = 'TOKEN-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-			companyData.activeInviteTokens.push(generatedToken); localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData));
-			const display = document.getElementById('inviteCodeDisplay'); display.textContent = generatedToken; display.style.display = 'block';
-		}
-		function createCustomRole() {
-			const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); const companyData = JSON.parse(localStorage.getItem('company_' + userData.companyId));
-			const title = document.getElementById('newRoleTitle').value.trim(); if(!title) return;
-			companyData.roles.push({ title: title, editProfile: document.getElementById('permEditProfile').checked, editRoles: document.getElementById('permEditRoles').checked, addWidgets: document.getElementById('permAddWidgets').checked });
-			localStorage.setItem('company_' + companyData.id, JSON.stringify(companyData)); document.getElementById('newRoleTitle').value = ''; alert(`Role ${title} Created.`);
-		}
-
-		/* --- DOCUMENTS ARCHITECTURE --- */
-		function renderDocuments() {
-            const currentLang = localStorage.getItem('site-lang') || 'en';
-			const container = document.getElementById('documentsContainer'); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode)); container.innerHTML = '';
-			if (!userData.documents || userData.documents.length === 0) { container.innerHTML = `<div class="empty-placeholder">${i18n[currentLang].noDocs}</div>`; return; }
-			userData.documents.forEach(doc => {
-				const card = document.createElement('div'); card.className = 'item-card';
-				let styleInline = '';
-				if(doc.style === 'bold') styleInline = 'font-weight: bold;'; if(doc.style === 'italic') styleInline = 'font-style: italic;'; if(doc.style === 'underline') styleInline = 'text-decoration: underline;';
-				card.innerHTML = `<h4>${doc.title}</h4><p style="${styleInline}">${doc.content}</p>`; container.appendChild(card);
-			});
-		}
-		document.getElementById('documentForm').addEventListener('submit', function(e) {
-			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			const newDocPayload = { title: document.getElementById('docTitle').value, style: document.getElementById('docFontWeight').value, content: document.getElementById('docContent').value };
-			if(!userData.documents) userData.documents = []; userData.documents.push(newDocPayload); localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData));
-			closeModal('documentModal'); this.reset(); renderDocuments();
-		});
-
-		/* --- GLOBAL CONTROL SYSTEM --- */
-		document.getElementById('editProfileForm').addEventListener('submit', function(e) {
-			e.preventDefault(); const userData = JSON.parse(localStorage.getItem('user_' + currentAccountCode));
-			userData.firstname = document.getElementById('editFirstname').value; userData.lastname = document.getElementById('editLastname').value; localStorage.setItem('user_' + currentAccountCode, JSON.stringify(userData)); alert('Profile updated!');
-		});
-		function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('site-theme', themeName); }
-		
-        function logout() { 
-            if (accessToken) {
-                google.accounts.oauth2.revoke(accessToken, () => {
-                    accessToken = null;
-                    currentAccountCode = null;
-                    document.getElementById('mainApp').style.display = 'none';
-                    document.getElementById('authWindow').style.display = 'block';
-                    document.getElementById('emails-list').innerHTML = '';
-                });
-            }
-        }
-	</script>
+    <script src="script.js"></script>
 </body>
 </html>
